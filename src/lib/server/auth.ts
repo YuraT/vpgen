@@ -10,8 +10,7 @@ export const sessionCookieName = 'auth-session';
 
 function generateSessionToken(): string {
 	const bytes = crypto.getRandomValues(new Uint8Array(20));
-	const token = encodeBase32LowerCaseNoPadding(bytes);
-	return token;
+	return encodeBase32LowerCaseNoPadding(bytes);
 }
 
 export async function createSession(userId: string): Promise<table.Session> {
