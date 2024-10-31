@@ -6,8 +6,8 @@
 	let { class: className, ...rest }: {class: string | undefined | null, rest: { [p: string]: unknown }} = $props();
 
 	let isLoading = $state(false);
-	async function onSubmit(event: Event) {
-		event.preventDefault();
+	async function onSubmit() {
+		// event.preventDefault();
 		isLoading = true;
 
 		setTimeout(() => {
@@ -17,12 +17,14 @@
 </script>
 
 <div class={cn("grid gap-6", className)} {...rest}>
-	<Button disabled={isLoading} onclick={onSubmit}>
-		{#if isLoading}
-			<LucideLoaderCircle class="mr-2 h-4 w-4 animate-spin" />
-		{:else}
-			<img class="mr-2 h-4 w-4" alt="Authentik Logo" src="https://auth.cazzzer.com/static/dist/assets/icons/icon.svg" />
-		{/if}
-		Authentik
-	</Button>
+	<a href="/auth/authentik">
+		<Button disabled={isLoading} onclick={onSubmit}>
+			{#if isLoading}
+				<LucideLoaderCircle class="mr-2 h-4 w-4 animate-spin" />
+			{:else}
+				<img class="mr-2 h-4 w-4" alt="Authentik Logo" src="https://auth.cazzzer.com/static/dist/assets/icons/icon.svg" />
+			{/if}
+			Authentik
+		</Button>
+	</a>
 </div>

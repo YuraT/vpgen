@@ -3,6 +3,8 @@ import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
+import type { RequestEvent } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -25,6 +27,16 @@ export async function createSession(userId: string): Promise<table.Session> {
 	return session;
 }
 
+export function setSessionTokenCookie(event: RequestEvent, sessionId: string, expiresAt: Date) {
+	event.cookies.set(sessionCookieName, sessionId, {
+		path: '/',
+		sameSite: 'lax',
+		httpOnly: true,
+		expires: expiresAt,
+		secure: !dev,
+	});
+}
+
 export async function invalidateSession(sessionId: string): Promise<void> {
 	await db.delete(table.session).where(eq(table.session.id, sessionId));
 }
@@ -33,7 +45,7 @@ export async function validateSession(sessionId: string) {
 	const [result] = await db
 		.select({
 			// Adjust user table here to tweak returned data
-			user: { id: table.user.id, username: table.user.username },
+			user: { id: table.user.id, username: table.user.username, name: table.user.name },
 			session: table.session
 		})
 		.from(table.session)
