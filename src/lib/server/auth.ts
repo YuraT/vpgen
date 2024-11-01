@@ -41,6 +41,10 @@ export async function invalidateSession(sessionId: string): Promise<void> {
 	await db.delete(table.session).where(eq(table.session.id, sessionId));
 }
 
+export function deleteSessionTokenCookie(event: RequestEvent) {
+	event.cookies.delete(sessionCookieName, { path: '/' });
+}
+
 export async function validateSession(sessionId: string) {
 	const [result] = await db
 		.select({
