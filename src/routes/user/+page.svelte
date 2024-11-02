@@ -16,6 +16,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>User Profile</title>
+</svelte:head>
+
 <p>
 	{JSON.stringify(data.user)}
 </p>

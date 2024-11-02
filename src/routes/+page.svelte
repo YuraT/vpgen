@@ -5,6 +5,10 @@
 	const { user } = data;
 </script>
 
+<svelte:head>
+	<title>VpGen</title>
+</svelte:head>
+
 <h1>Welcome to SvelteKit</h1>
 
 {#if user }
