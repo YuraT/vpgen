@@ -34,6 +34,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 const authRequired = new Set([
 	'/user',
 	'/connections',
+	'/api/connections',
 ]);
 const handleProtectedPaths: Handle = ({ event, resolve }) => {
 	if (authRequired.has(event.url.pathname) && !event.locals.user) {

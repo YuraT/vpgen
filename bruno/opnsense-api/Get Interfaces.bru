@@ -1,0 +1,28 @@
+meta {
+  name: Get Interfaces
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://opnsense.home/api/wireguard/service/show
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "current": 1,
+    "rowCount": 7,
+    "sort": {},
+    "searchPhrase": "",
+    "type": [
+      "interface"
+    ]
+  }
+}

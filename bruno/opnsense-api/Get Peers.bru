@@ -1,0 +1,28 @@
+meta {
+  name: Get Peers
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://opnsense.home/api/wireguard/service/show
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "current": 1,
+    "rowCount": 7,
+    "sort": {},
+    "searchPhrase": "",
+    "type": [
+      "peer"
+    ]
+  }
+}

@@ -5,16 +5,20 @@
 
 	const { data, children } = $props();
 	const { user } = data;
+
+	function getNavClass(path: string) {
+		return cn("hover:text-foreground/80 transition-colors",
+			$page.url.pathname === path ? "text-foreground" : "text-foreground/60");
+	}
 </script>
 
 <header class="p-4 sm:flex">
 	<span class=" mr-6 font-bold sm:inline-block">My App</span>
 	<nav class="flex items-center gap-6 text-sm">
-		<a href="/" class={cn("hover:text-foreground/80 transition-colors",
-				$page.url.pathname === "/" ? "text-foreground" : "text-foreground/60")}>Home</a>
+		<a href="/" class={getNavClass("/")}>Home</a>
 		{#if user}
-			<a href="/user" class={cn("hover:text-foreground/80 transition-colors",
-				$page.url.pathname === "/user" ? "text-foreground" : "text-foreground/60")}>Profile</a>
+			<a href="/user" class={getNavClass("/user")}>Profile</a>
+			<a href="/connections" class={getNavClass("/connections")}>Connections</a>
 		{/if}
 	</nav>
 </header>
