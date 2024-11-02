@@ -2,8 +2,13 @@
 	import type { PageData } from './$types';
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import * as Table from '$lib/components/ui/table';
+	import { Checkbox } from '$lib/components/ui/checkbox';
+	import { Label } from '$lib/components/ui/label';
 
 	const { data }: { data: PageData } = $props();
+	let showOnlyActive = $state(false);
+	const peerRows = $derived(data.peers.rows.filter((peer) => showOnlyActive ? peer['latest-handshake'] : true));
 
 	onMount(() => {
 		// refresh every 5 seconds
@@ -30,37 +35,45 @@
 	<title>Connections</title>
 </svelte:head>
 
-<table>
-	<thead>
-	<tr>
-		<th>Public Key</th>
-		<th>Endpoint</th>
-		<th>Allowed IPs</th>
-		<th>Latest Handshake</th>
-		<th>RX</th>
-		<th>TX</th>
-		<th>Persistent Keepalive</th>
-		<th>Name</th>
-		<th>Interface Name</th>
-	</tr>
-	</thead>
-	<tbody>
-	{#each data.peers.rows as peer}
-		<tr>
-			<td>{peer['public-key'].substring(0, 10)}</td>
-			<td>{peer.endpoint}</td>
-			<td>{peer['allowed-ips']}</td>
-			{#if peer['latest-handshake']}
-				<td>{new Date(peer['latest-handshake'] * 1000)}</td>
-			{:else}
-				<td>Never</td>
-			{/if}
-			<td>{getSize(peer['transfer-rx'])}</td>
-			<td>{getSize(peer['transfer-tx'])}</td>
-			<td>{peer['persistent-keepalive']}</td>
-			<td>{peer.name}</td>
-			<td>{peer.ifname}</td>
-		</tr>
-	{/each}
-	</tbody>
-</table>
+<Checkbox id="showOnlyActive" bind:checked={showOnlyActive} />
+<Label for="showOnlyActive">Show only active connections</Label>
+
+{#if peerRows.length === 0}
+	<p>No active connections</p>
+
+{:else}
+	<Table.Root class="bg-accent rounded-xl">
+		<Table.Header>
+			<Table.Head>Name</Table.Head>
+			<Table.Head>Public Key</Table.Head>
+			<Table.Head>Endpoint</Table.Head>
+			<Table.Head>Allowed IPs</Table.Head>
+			<Table.Head>Latest Handshake</Table.Head>
+			<Table.Head>RX</Table.Head>
+			<Table.Head>TX</Table.Head>
+			<Table.Head>Persistent Keepalive</Table.Head>
+			<Table.Head>Interface Name</Table.Head>
+		</Table.Header>
+		<Table.Body>
+			{#each peerRows as peer}
+				<Table.Row class="border-y-2 border-background">
+					<Table.Cell>{peer.name}</Table.Cell>
+					<Table.Cell>{peer['public-key'].substring(0, 10)}</Table.Cell>
+					<Table.Cell>{peer.endpoint}</Table.Cell>
+					<Table.Cell>{peer['allowed-ips']}</Table.Cell>
+					{#if peer['latest-handshake']}
+						<Table.Cell>{new Date(peer['latest-handshake'] * 1000).toLocaleString()}</Table.Cell>
+						<Table.Cell>{getSize(peer['transfer-rx'])}</Table.Cell>
+						<Table.Cell>{getSize(peer['transfer-tx'])}</Table.Cell>
+					{:else}
+						<Table.Cell>Never</Table.Cell>
+						<Table.Cell>--</Table.Cell>
+						<Table.Cell>--</Table.Cell>
+					{/if}
+					<Table.Cell>{peer['persistent-keepalive']}</Table.Cell>
+					<Table.Cell>{peer.ifname}</Table.Cell>
+				</Table.Row>
+			{/each}
+		</Table.Body>
+	</Table.Root>
+{/if}
