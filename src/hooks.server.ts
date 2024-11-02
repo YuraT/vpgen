@@ -1,6 +1,7 @@
-import type { Handle } from '@sveltejs/kit';
+import { type Handle, redirect } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import * as auth from '$lib/server/auth';
+import { sequence } from '@sveltejs/kit/hooks';
 
 const handleAuth: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get(auth.sessionCookieName);
@@ -29,4 +30,16 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle: Handle = handleAuth;
+
+const authRequired = new Set([
+	'/user',
+	'/connections',
+]);
+const handleProtectedPaths: Handle = ({ event, resolve }) => {
+	if (authRequired.has(event.url.pathname) && !event.locals.user) {
+		return redirect(302, '/');
+	}
+	return resolve(event);
+}
+
+export const handle: Handle = sequence(handleAuth, handleProtectedPaths);
