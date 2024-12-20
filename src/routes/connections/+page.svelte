@@ -1,21 +1,28 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { invalidate } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import * as Table from '$lib/components/ui/table';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Label } from '$lib/components/ui/label';
 
 	const { data }: { data: PageData } = $props();
-	let showOnlyActive = $state(false);
-	const peerRows = $derived(data.peers.rows.filter((peer) => showOnlyActive ? peer['latest-handshake'] : true));
+	let showOnlyActive = $state($page.url.searchParams.get('showOnlyActive') === '1');
 
-	onMount(() => {
+	$effect(() => {
 		// refresh every 5 seconds
-		setInterval(() => {
+		const interval = setInterval(() => {
 			console.log('Refreshing connections');
 			invalidate('/api/connections');
 		}, 5000);
+
+		return () => clearInterval(interval);
+	});
+	$effect(() => {
+		window.history.replaceState(history.state, '', window.location.pathname + `?showOnlyActive=${showOnlyActive? 1 : 0}`);
+		// other options that worked less well (at some things)
+		// pushState('', {showOnlyActive: showOnlyActive});
+		// goto(`?showOnlyActive=${showOnlyActive? 1 : 0}`);
 	});
 
 	function getSize(size: number) {
@@ -38,24 +45,21 @@
 <Checkbox id="showOnlyActive" bind:checked={showOnlyActive} />
 <Label for="showOnlyActive">Show only active connections</Label>
 
-{#if peerRows.length === 0}
-	<p>No active connections</p>
-
-{:else}
-	<Table.Root class="bg-accent rounded-xl">
-		<Table.Header>
-			<Table.Head>Name</Table.Head>
-			<Table.Head>Public Key</Table.Head>
-			<Table.Head>Endpoint</Table.Head>
-			<Table.Head>Allowed IPs</Table.Head>
-			<Table.Head>Latest Handshake</Table.Head>
-			<Table.Head>RX</Table.Head>
-			<Table.Head>TX</Table.Head>
-			<Table.Head>Persistent Keepalive</Table.Head>
-			<Table.Head>Interface Name</Table.Head>
-		</Table.Header>
-		<Table.Body>
-			{#each peerRows as peer}
+<Table.Root class="bg-accent rounded-xl">
+	<Table.Header>
+		<Table.Head>Name</Table.Head>
+		<Table.Head>Public Key</Table.Head>
+		<Table.Head>Endpoint</Table.Head>
+		<Table.Head>Allowed IPs</Table.Head>
+		<Table.Head>Latest Handshake</Table.Head>
+		<Table.Head>RX</Table.Head>
+		<Table.Head>TX</Table.Head>
+		<Table.Head>Persistent Keepalive</Table.Head>
+		<Table.Head>Interface Name</Table.Head>
+	</Table.Header>
+	<Table.Body>
+		{#each data.peers.rows as peer}
+			{#if peer['latest-handshake'] || !showOnlyActive }
 				<Table.Row class="border-y-2 border-background">
 					<Table.Cell>{peer.name}</Table.Cell>
 					<Table.Cell>{peer['public-key'].substring(0, 10)}</Table.Cell>
@@ -73,7 +77,7 @@
 					<Table.Cell>{peer['persistent-keepalive']}</Table.Cell>
 					<Table.Cell>{peer.ifname}</Table.Cell>
 				</Table.Row>
-			{/each}
-		</Table.Body>
-	</Table.Root>
-{/if}
+			{/if}
+		{/each}
+	</Table.Body>
+</Table.Root>

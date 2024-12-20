@@ -28,5 +28,10 @@ export const GET: RequestHandler = async ({ url }) => {
 	if (!peers) {
 		error(500, "Error getting info from OPNsense API");
 	}
-	return new Response(JSON.stringify(peers));
+	return new Response(JSON.stringify(peers), {
+		headers: {
+			'Content-Type': 'application/json',
+			'Cache-Control': 'max-age=5',
+		}
+	});
 };
