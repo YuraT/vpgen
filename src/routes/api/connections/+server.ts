@@ -1,14 +1,14 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { env } from '$env/dynamic/private';
+import { opnsenseAuth, opnsenseIfname, opnsenseUrl } from '$lib/server/opnsense';
 import type { OpnsenseWgPeers } from '$lib/opnsense/wg';
 
-export const GET: RequestHandler = async ({ url }) => {
-	const apiUrl = `${env.OPNSENSE_API_URL}/api/wireguard/service/show`;
+export const GET: RequestHandler = async () => {
+	const apiUrl = `${opnsenseUrl}/api/wireguard/service/show`;
 	const options: RequestInit = {
 		method: 'POST',
 		headers: {
-			Authorization: `Basic ${Buffer.from(`${env.OPNSENSE_API_KEY}:${env.OPNSENSE_API_SECRET}`).toString('base64')}`,
+			Authorization: opnsenseAuth,
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
 		},
@@ -24,6 +24,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	const res = await fetch(apiUrl, options);
 	const peers = await res.json() as OpnsenseWgPeers;
+	peers.rows = peers.rows.filter(peer => peer['latest-handshake'] && peer.ifname === opnsenseIfname)
 
 	if (!peers) {
 		error(500, "Error getting info from OPNsense API");
