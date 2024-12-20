@@ -1,11 +1,11 @@
 meta {
-  name: Get Interfaces
+  name: Search Server
   type: http
-  seq: 2
+  seq: 4
 }
 
 post {
-  url: {{base}}/api/wireguard/service/show
+  url: {{base}}/api/wireguard/server/searchServer
   body: json
   auth: inherit
 }
@@ -19,10 +19,7 @@ body:json {
     "current": 1,
     "rowCount": 7,
     "sort": {},
-    "searchPhrase": "{{searchPhrase}}",
-    "type": [
-      "interface"
-    ]
+    "searchPhrase": "{{searchPhrase}}"
   }
 }
 

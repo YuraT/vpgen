@@ -1,0 +1,15 @@
+meta {
+  name: Get Server Info
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{base}}/api/wireguard/client/get_server_info/:server_uuid
+  body: none
+  auth: inherit
+}
+
+params:path {
+  server_uuid: 8799c789-b6fb-4aa8-9dac-edf18d860340
+}

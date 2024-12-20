@@ -5,14 +5,13 @@ meta {
 }
 
 post {
-  url: https://opnsense.home/api/wireguard/service/show
+  url: {{base}}/api/wireguard/service/show
   body: json
   auth: inherit
 }
 
 headers {
   Content-Type: application/json
-  Accept: application/json
 }
 
 body:json {
@@ -20,9 +19,13 @@ body:json {
     "current": 1,
     "rowCount": 7,
     "sort": {},
-    "searchPhrase": "",
+    "searchPhrase": "{{searchPhrase}}",
     "type": [
       "peer"
     ]
   }
+}
+
+vars:pre-request {
+  searchPhrase: 
 }

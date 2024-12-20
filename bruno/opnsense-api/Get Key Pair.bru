@@ -1,0 +1,11 @@
+meta {
+  name: Get Key Pair
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{base}}/api/wireguard/server/key_pair
+  body: none
+  auth: inherit
+}

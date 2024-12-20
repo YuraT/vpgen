@@ -1,0 +1,38 @@
+meta {
+  name: Add Client Builder
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{base}}/api/wireguard/client/addClientBuilder
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "configbuilder": {
+      "enabled": "1",
+      "name": "{{clientName}}",
+      "pubkey": "{{clientPubkey}}",
+      "psk": "{{psk}}",
+      "tunneladdress": "{{clientTunnelAddress}}",
+      "keepalive": "",
+      "server": "{{serverUuid}}",
+      "endpoint": "{{vpn_endpoint}}"
+    }
+  }
+}
+
+vars:pre-request {
+  clientName: vpgen-test
+  clientPubkey: BJ5faPVJsDP4CCxNYilmKnwlQXOtXEOJjqIwb4U/CgM=
+  psk: 0LWopbrISXBNHUxr+WOhCSAg+0hD8j3TLmpyzHkBHCQ=
+  clientTunnelAddress: 10.18.11.101/32,fd00::1/128
+  serverUuid: 99f278fb-5b79-4fde-b3d8-afab19f1fc07
+}

@@ -1,11 +1,11 @@
 meta {
-  name: Get Interfaces
+  name: Search Client
   type: http
-  seq: 2
+  seq: 5
 }
 
 post {
-  url: {{base}}/api/wireguard/service/show
+  url: {{base}}/api/wireguard/client/searchClient
   body: json
   auth: inherit
 }
@@ -19,13 +19,12 @@ body:json {
     "current": 1,
     "rowCount": 7,
     "sort": {},
-    "searchPhrase": "{{searchPhrase}}",
-    "type": [
-      "interface"
-    ]
+    "servers": ["{{serverUuid}}"],
+    "searchPhrase": "{{searchPhrase}}"
   }
 }
 
 vars:pre-request {
   searchPhrase: 
+  serverUuid: 64e1d6ec-980a-463d-8583-c863d8e9852b
 }

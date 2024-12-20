@@ -1,0 +1,11 @@
+meta {
+  name: Get PSK
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{base}}/api/wireguard/client/psk
+  body: none
+  auth: inherit
+}
