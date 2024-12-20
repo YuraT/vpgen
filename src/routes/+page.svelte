@@ -6,10 +6,10 @@
 </script>
 
 <svelte:head>
-	<title>VpGen</title>
+	<title>VPGen</title>
 </svelte:head>
 
-<h1>Welcome to SvelteKit</h1>
+<h1>Welcome to VPGen</h1>
 
 {#if user }
 	<p>Hi {user.name}</p>

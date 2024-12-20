@@ -13,7 +13,7 @@
 </script>
 
 <header class="p-4 sm:flex">
-	<span class=" mr-6 font-bold sm:inline-block">My App</span>
+	<span class=" mr-6 font-bold sm:inline-block">VPGen</span>
 	<nav class="flex items-center gap-6 text-sm">
 		<a href="/" class={getNavClass("/")}>Home</a>
 		{#if user}
