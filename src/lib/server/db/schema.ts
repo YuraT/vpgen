@@ -49,7 +49,14 @@ export const wgClients = sqliteTable('wg_clients', {
 });
 
 export const wgClientsRelations = relations(wgClients, ({ one }) => ({
-	ipAllocation: one(ipAllocations),
+	user: one(users, {
+		fields: [wgClients.userId],
+		references: [users.id],
+	}),
+	ipAllocation: one(ipAllocations, {
+		fields: [wgClients.id],
+		references: [ipAllocations.clientId],
+	}),
 }));
 
 export type WgClient = typeof wgClients.$inferSelect;

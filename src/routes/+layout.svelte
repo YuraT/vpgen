@@ -19,6 +19,7 @@
 		{#if user}
 			<a href="/user" class={getNavClass("/user")}>Profile</a>
 			<a href="/connections" class={getNavClass("/connections")}>Connections</a>
+			<a href="/clients" class={getNavClass("/clients")}>Clients</a>
 		{/if}
 	</nav>
 </header>

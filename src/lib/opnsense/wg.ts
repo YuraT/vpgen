@@ -67,3 +67,41 @@ export interface OpnsenseWgServers {
 		uuid: string;
 	}[];
 }
+
+/**
+ * Sample response for OPNsense WireGuard clients
+ * ```json
+ * {
+ *   "rows": [
+ *     {
+ *       "uuid": "d99334de-7671-4ca7-9c9b-5f5578acae70",
+ *       "enabled": "1",
+ *       "name": "Yura-TPX13",
+ *       "pubkey": "iJa5JmJbMHNlbEluNwoB2Q8LyrPAfb7S/mluanMcI08=",
+ *       "tunneladdress": "fd00::1/112,10.6.0.3/32",
+ *       "serveraddress": "",
+ *       "serverport": "",
+ *       "servers": "wg0"
+ *     }
+ *   ],
+ *   "rowCount": 1,
+ *   "total": 10,
+ *   "current": 1
+ * }
+ * ```
+ */
+export interface OpnsenseWgClients {
+	rowCount: number;
+	total: number;
+	current: number;
+	rows: {
+		uuid: string;
+		enabled: string;
+		name: string;
+		pubkey: string;
+		tunneladdress: string;
+		serveraddress: string;
+		serverport: string;
+		servers: string;
+	}[];
+}
