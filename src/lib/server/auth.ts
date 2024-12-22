@@ -23,7 +23,7 @@ export async function createSession(userId: string): Promise<table.Session> {
 		userId,
 		expiresAt: new Date(Date.now() + DAY_IN_MS * 30)
 	};
-	await db.insert(table.session).values(session);
+	await db.insert(table.sessions).values(session);
 	return session;
 }
 
@@ -38,7 +38,7 @@ export function setSessionTokenCookie(event: RequestEvent, sessionId: string, ex
 }
 
 export async function invalidateSession(sessionId: string): Promise<void> {
-	await db.delete(table.session).where(eq(table.session.id, sessionId));
+	await db.delete(table.sessions).where(eq(table.sessions.id, sessionId));
 }
 
 export function deleteSessionTokenCookie(event: RequestEvent) {
@@ -49,12 +49,12 @@ export async function validateSession(sessionId: string) {
 	const [result] = await db
 		.select({
 			// Adjust user table here to tweak returned data
-			user: { id: table.user.id, username: table.user.username, name: table.user.name },
-			session: table.session
+			user: { id: table.users.id, username: table.users.username, name: table.users.name },
+			session: table.sessions
 		})
-		.from(table.session)
-		.innerJoin(table.user, eq(table.session.userId, table.user.id))
-		.where(eq(table.session.id, sessionId));
+		.from(table.sessions)
+		.innerJoin(table.users, eq(table.sessions.userId, table.users.id))
+		.where(eq(table.sessions.id, sessionId));
 
 	if (!result) {
 		return { session: null, user: null };
@@ -63,7 +63,7 @@ export async function validateSession(sessionId: string) {
 
 	const sessionExpired = Date.now() >= session.expiresAt.getTime();
 	if (sessionExpired) {
-		await db.delete(table.session).where(eq(table.session.id, session.id));
+		await db.delete(table.sessions).where(eq(table.sessions.id, session.id));
 		return { session: null, user: null };
 	}
 
@@ -71,9 +71,9 @@ export async function validateSession(sessionId: string) {
 	if (renewSession) {
 		session.expiresAt = new Date(Date.now() + DAY_IN_MS * 30);
 		await db
-			.update(table.session)
+			.update(table.sessions)
 			.set({ expiresAt: session.expiresAt })
-			.where(eq(table.session.id, session.id));
+			.where(eq(table.sessions.id, session.id));
 	}
 
 	return { session, user };

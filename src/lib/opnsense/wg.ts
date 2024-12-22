@@ -59,3 +59,11 @@ export interface OpnsenseWgPeers {
  * };
  * ```
  */
+
+export interface OpnsenseWgServers {
+	status: "ok" | string | number;
+	rows: {
+		name: string;
+		uuid: string;
+	}[];
+}

@@ -39,7 +39,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	const userId: string = claims.sub;
 	const username: string = claims.preferred_username;
 
-	const [existingUser] = await db.select().from(table.user).where(eq(table.user.id, userId));
+	const existingUser = await db.query.users.findFirst({where: eq(table.users.id, userId)});
 
 	if (existingUser) {
 		const session = await createSession(existingUser.id);
@@ -59,7 +59,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 	};
 
 	try {
-		await db.insert(table.user).values(user);
+		await db.insert(table.users).values(user);
 		const session = await createSession(user.id);
 		setSessionTokenCookie(event, session.id, session.expiresAt);
 	} catch (e) {
