@@ -27,8 +27,10 @@
 				<Table.Cell class="truncate max-w-[10ch]">{client.publicKey}</Table.Cell>
 				<Table.Cell class="truncate max-w-[10ch]">{client.privateKey}</Table.Cell>
 				<Table.Cell class="truncate max-w-[10ch]">{client.preSharedKey}</Table.Cell>
-				<Table.Cell>
-					<Badge class="bg-background select-auto" variant="secondary">{client.ipAllocation.id}</Badge>
+				<Table.Cell class="flex gap-1">
+					{#each client.ips as ip}
+						<Badge class="bg-background select-auto" variant="secondary">{ip}</Badge>
+					{/each}
 				</Table.Cell>
 			</Table.Row>
 		{/each}

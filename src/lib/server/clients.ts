@@ -87,7 +87,7 @@ export async function createClient(params: {
 				username: params.user.username,
 				pubkey: keys.pubkey,
 				psk: keys.psk,
-				allowedIps: getAllowedIps(ipAllocationId - 1),
+				allowedIps: getIpsFromIndex(ipAllocationId - 1).join(','),
 			});
 			const opnsenseResJson = await opnsenseRes.json();
 			if (opnsenseResJson['result'] !== 'saved') {
@@ -124,7 +124,7 @@ async function getKeys() {
 	};
 }
 
-function getAllowedIps(ipIndex: number) {
+export function getIpsFromIndex(ipIndex: number) {
 	const v4StartingAddr = new Address4(IPV4_STARTING_ADDR);
 	const v6StartingAddr = new Address6(IPV6_STARTING_ADDR);
 	const v4Allowed = Address4.fromBigInt(v4StartingAddr.bigInt() + BigInt(ipIndex));
@@ -132,9 +132,11 @@ function getAllowedIps(ipIndex: number) {
 	const v6Allowed = Address6.fromBigInt(v6StartingAddr.bigInt() + v6Offset);
 	const v6AllowedShort = v6Allowed.parsedAddress.join(':');
 
-	return `${v4Allowed.address}/32,${v6AllowedShort}/${IPV6_CLIENT_PREFIX_SIZE}`;
+	return [
+		v4Allowed.address + '/32',
+		v6AllowedShort + '/' + IPV6_CLIENT_PREFIX_SIZE,
+	];
 }
-
 async function opnsenseCreateClient(params: {
 	username: string;
 	pubkey: string;

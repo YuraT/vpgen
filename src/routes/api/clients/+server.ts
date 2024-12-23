@@ -3,7 +3,7 @@ import { wgClients } from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
-import { createClient } from '$lib/server/clients';
+import { createClient, getIpsFromIndex } from '$lib/server/clients';
 
 export const GET: RequestHandler = async (event) => {
 	if (!event.locals.user) {
@@ -19,11 +19,30 @@ export const GET: RequestHandler = async (event) => {
 };
 
 async function findClients(userId: string) {
-	return db.query.wgClients.findMany({
-		where: eq(wgClients.userId, userId),
+	const clientsData = await db.query.wgClients.findMany({
+		columns: {
+			id: true,
+			name: true,
+			publicKey: true,
+			privateKey: true,
+			preSharedKey: true,
+		},
 		with: {
 			ipAllocation: true,
 		},
+		where: eq(wgClients.userId, userId),
+	});
+	// replace ip index with actual addresses
+	return clientsData.map((client) => {
+		const ips = getIpsFromIndex(client.ipAllocation.id);
+		return {
+			id: client.id,
+			name: client.name,
+			publicKey: client.publicKey,
+			privateKey: client.privateKey,
+			preSharedKey: client.preSharedKey,
+			ips,
+		};
 	});
 }
 
