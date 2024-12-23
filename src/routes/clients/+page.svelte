@@ -22,8 +22,12 @@
 	</Table.Header>
 	<Table.Body>
 		{#each data.clients as client}
-			<Table.Row class="border-y-2 border-background">
-				<Table.Cell>{client.name}</Table.Cell>
+			<Table.Row class="border-y-2 border-background hover:bg-muted-foreground">
+				<a href={`/clients/${client.id}`} class="contents">
+					<Table.Cell>
+						{client.name}
+					</Table.Cell>
+				</a>
 				<Table.Cell class="truncate max-w-[10ch]">{client.publicKey}</Table.Cell>
 				<Table.Cell class="truncate max-w-[10ch]">{client.privateKey}</Table.Cell>
 				<Table.Cell class="truncate max-w-[10ch]">{client.preSharedKey}</Table.Cell>

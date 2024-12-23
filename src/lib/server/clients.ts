@@ -1,17 +1,69 @@
 import type { User } from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
 import { wgClients, ipAllocations } from '$lib/server/db/schema';
-import { opnsenseAuth, opnsenseUrl, serverUuid } from '$lib/server/opnsense';
+import { opnsenseAuth, opnsenseUrl, serverPublicKey, serverUuid } from '$lib/server/opnsense';
 import { Address4, Address6 } from 'ip-address';
 import {
 	IP_MAX_INDEX,
 	IPV4_STARTING_ADDR,
 	IPV6_CLIENT_PREFIX_SIZE,
-	IPV6_STARTING_ADDR, MAX_CLIENTS_PER_USER,
+	IPV6_STARTING_ADDR,
+	MAX_CLIENTS_PER_USER,
+	VPN_DNS,
 	VPN_ENDPOINT,
 } from '$env/static/private';
-import { count, eq, isNull } from 'drizzle-orm';
+import { and, count, eq, isNull } from 'drizzle-orm';
 import { err, ok, type Result } from '$lib/types';
+import type { ClientDetails } from '$lib/types/clients';
+
+export async function findClients(userId: string) {
+	return db.query.wgClients.findMany({
+		columns: {
+			id: true,
+			name: true,
+			publicKey: true,
+			privateKey: true,
+			preSharedKey: true,
+		},
+		with: {
+			ipAllocation: true,
+		},
+		where: eq(wgClients.userId, userId),
+	});
+}
+
+export async function findClient(userId: string, clientId: number) {
+	return db.query.wgClients.findFirst({
+		columns: {
+			id: true,
+			name: true,
+			publicKey: true,
+			privateKey: true,
+			preSharedKey: true,
+		},
+		with: {
+			ipAllocation: true,
+		},
+		where: and(eq(wgClients.userId, userId), eq(wgClients.id, clientId)),
+	});
+}
+
+export function mapClientToDetails(
+	client: Awaited<ReturnType<typeof findClients>>[0],
+): ClientDetails {
+	const ips = getIpsFromIndex(client.ipAllocation.id);
+	return {
+		id: client.id,
+		name: client.name,
+		publicKey: client.publicKey,
+		privateKey: client.privateKey,
+		preSharedKey: client.preSharedKey,
+		ips,
+		vpnPublicKey: serverPublicKey,
+		vpnEndpoint: VPN_ENDPOINT,
+		vpnDns: VPN_DNS,
+	};
+}
 
 export async function createClient(params: {
 	name: string;
@@ -22,7 +74,8 @@ export async function createClient(params: {
 		.select({ clientCount: count() })
 		.from(wgClients)
 		.where(eq(wgClients.userId, params.user.id));
-	if (clientCount >= parseInt(MAX_CLIENTS_PER_USER)) return err([400, 'Maximum number of clients reached'] as [400, string]);
+	if (clientCount >= parseInt(MAX_CLIENTS_PER_USER))
+		return err([400, 'Maximum number of clients reached'] as [400, string]);
 
 	// this is going to be quite long
 	// 1. fetch params for new client from opnsense api
@@ -31,7 +84,7 @@ export async function createClient(params: {
 	// 2.3. update the allocation with the client id
 	// 3. create the client in opnsense
 	// 4. reconfigure opnsense to enable the new client
-	const error= await db.transaction(async (tx) => {
+	const error = await db.transaction(async (tx) => {
 		const [keys, availableAllocation, lastAllocation] = await Promise.all([
 			// fetch params for new client from opnsense api
 			getKeys(),
@@ -132,11 +185,9 @@ export function getIpsFromIndex(ipIndex: number) {
 	const v6Allowed = Address6.fromBigInt(v6StartingAddr.bigInt() + v6Offset);
 	const v6AllowedShort = v6Allowed.parsedAddress.join(':');
 
-	return [
-		v4Allowed.address + '/32',
-		v6AllowedShort + '/' + IPV6_CLIENT_PREFIX_SIZE,
-	];
+	return [v4Allowed.address + '/32', v6AllowedShort + '/' + IPV6_CLIENT_PREFIX_SIZE];
 }
+
 async function opnsenseCreateClient(params: {
 	username: string;
 	pubkey: string;

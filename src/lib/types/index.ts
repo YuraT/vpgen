@@ -1,5 +1,5 @@
 class Ok<T> {
-	readonly _tag = "ok";
+	readonly _tag = 'ok';
 	value: T;
 
 	constructor(value: T) {
@@ -8,7 +8,7 @@ class Ok<T> {
 }
 
 class Err<E> {
-	readonly _tag = "err";
+	readonly _tag = 'err';
 	error: E;
 
 	constructor(error: E) {

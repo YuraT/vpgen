@@ -7,8 +7,8 @@
 	const { user } = data;
 
 	function getNavClass(path: string) {
-		return cn("hover:text-foreground/80 transition-colors",
-			$page.url.pathname === path ? "text-foreground" : "text-foreground/60");
+		return cn('hover:text-foreground/80 transition-colors',
+			$page.url.pathname.startsWith(path) ? 'text-foreground' : 'text-foreground/60');
 	}
 </script>
 
