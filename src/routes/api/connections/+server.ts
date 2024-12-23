@@ -26,7 +26,6 @@ export const GET: RequestHandler = async (event) => {
 			'type': ['peer'],
 		}),
 	};
-	console.log('Fetching peers from OPNsense WireGuard API: ', apiUrl, options)
 
 	const res = await fetch(apiUrl, options);
 	const peers = await res.json() as OpnsenseWgPeers;

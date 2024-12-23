@@ -54,7 +54,7 @@
 				<Table.Cell>
 					<div class="flex flex-wrap gap-1">
 						{#each peer['allowed-ips'].split(',') as addr}
-							<Badge class="bg-background" variant="secondary">{addr}</Badge>
+							<Badge class="bg-background select-auto" variant="secondary">{addr}</Badge>
 						{/each}
 					</div>
 				</Table.Cell>

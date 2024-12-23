@@ -26,7 +26,7 @@
 				<Table.Cell class="truncate max-w-[10ch]">{client.privateKey}</Table.Cell>
 				<Table.Cell class="truncate max-w-[10ch]">{client.preSharedKey}</Table.Cell>
 				<Table.Cell>
-					<Badge class="bg-background" variant="secondary">{client.ipAllocation.id}</Badge>
+					<Badge class="bg-background select-auto" variant="secondary">{client.ipAllocation.id}</Badge>
 				</Table.Cell>
 			</Table.Row>
 		{/each}
