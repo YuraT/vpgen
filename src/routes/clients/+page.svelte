@@ -1,7 +1,9 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table';
 	import { Badge } from '$lib/components/ui/badge';
+	import { Button } from '$lib/components/ui/button';
 	import type { PageData } from './$types';
+	import { LucidePlus } from 'lucide-svelte';
 
 	const { data }: { data: PageData } = $props();
 </script>
@@ -32,3 +34,11 @@
 		{/each}
 	</Table.Body>
 </Table.Root>
+
+<!--Floating action button for adding a new client-->
+<form class="self-end mt-auto pt-4" method="post" action="?/create">
+	<Button type="submit">
+		<LucidePlus />
+		Add Client
+	</Button>
+</form>

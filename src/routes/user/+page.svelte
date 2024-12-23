@@ -7,9 +7,9 @@
 	let isLoadingSignOut = $state(false);
 
 	function refetch() {
-		console.log("refetching");
+		console.log('refetching');
 		invalidate((url) => {
-			console.log("invalidation url", url);
+			console.log('invalidation url', url);
 			return true;
 		});
 		invalidateAll();
@@ -20,21 +20,21 @@
 	<title>User Profile</title>
 </svelte:head>
 
-<p>
-	{JSON.stringify(data.user)}
-</p>
+<pre>{JSON.stringify(data.user, null, 2)}</pre>
 
-<Button onclick={refetch}>
+<div class="flex gap-2">
+	<Button onclick={refetch}>
 		<LucideRefreshCw class="mr-2 h-4 w-4" />
-	Invalidate Data
-</Button>
-<form class="inline-flex" method="post" action="/auth?/logout">
-	<Button type="submit" onclick={() => {isLoadingSignOut = true}}>
-		{#if isLoadingSignOut}
-			<LucideLoaderCircle class="mr-2 h-4 w-4 animate-spin" />
-		{:else}
-			<LucideLogOut class="mr-2 h-4 w-4" />
-		{/if}
-		Sign Out
+		Invalidate Data
 	</Button>
-</form>
+	<form class="inline-flex" method="post" action="/auth?/logout">
+		<Button type="submit" onclick={() => {isLoadingSignOut = true}}>
+			{#if isLoadingSignOut}
+				<LucideLoaderCircle class="mr-2 h-4 w-4 animate-spin" />
+			{:else}
+				<LucideLogOut class="mr-2 h-4 w-4" />
+			{/if}
+			Sign Out
+		</Button>
+	</form>
+</div>

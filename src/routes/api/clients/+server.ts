@@ -1,17 +1,9 @@
 import { error } from '@sveltejs/kit';
-import { ipAllocations, wgClients } from '$lib/server/db/schema';
+import { wgClients } from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
-import { eq, isNull } from 'drizzle-orm';
-import {
-	IP_MAX_INDEX,
-	IPV4_STARTING_ADDR,
-	IPV6_CLIENT_PREFIX_SIZE,
-	IPV6_STARTING_ADDR,
-	VPN_ENDPOINT,
-} from '$env/static/private';
-import { opnsenseAuth, opnsenseUrl, serverUuid } from '$lib/server/opnsense';
+import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
-import { Address4, Address6 } from 'ip-address';
+import { createClient } from '$lib/server/clients';
 
 export const GET: RequestHandler = async (event) => {
 	if (!event.locals.user) {
@@ -41,150 +33,21 @@ export const POST: RequestHandler = async (event) => {
 	if (!event.locals.user) {
 		return error(401, 'Unauthorized');
 	}
-	// this is going to be quite long
-	// 1. fetch params for new client from opnsense api
-	// 2.1 get an allocation for the client
-	// 2.2. insert new client into db
-	// 2.3. update the allocation with the client id
-	// 3. create the client in opnsense
-	// 4. reconfigure opnsense to enable the new client
-	const err: ReturnType<typeof error> | undefined = await db.transaction(async (tx) => {
-		// fetch params for new client from opnsense api
-		const keys = await getKeys();
+	const { name } = await event.request.json();
+	const res = await createClient({
+		name,
+		user: event.locals.user,
+	});
 
-		// find first unallocated IP
-		const availableAllocation = await tx.query.ipAllocations.findFirst({
-			columns: {
-				id: true,
-			},
-			where: isNull(ipAllocations.clientId),
-		});
-		// find last allocation to check if we have any IPs left
-		const lastAllocation = await tx.query.ipAllocations.findFirst({
-			columns: {
-				id: true,
-			},
-			orderBy: (ipAllocations, { desc }) => desc(ipAllocations.id),
-		});
-		// check for existing allocation or if we have any IPs left
-		if (!availableAllocation && lastAllocation && lastAllocation.id >= parseInt(IP_MAX_INDEX)) {
-			return error(500, 'No more IP addresses available');
-		}
-
-		// use existing allocation or create a new one
-		const ipAllocationId =
-			availableAllocation?.id ??
-			(await tx.insert(ipAllocations).values({}).returning({ id: ipAllocations.id }))[0].id;
-
-		// transaction savepoint after creating a new IP allocation
-		// TODO: not sure if this is needed
-		return await tx.transaction(async (tx2) => {
-			// create client in opnsense
-			const opnsenseRes = await opnsenseCreateClient({
-				// @ts-expect-error event.locals.user is checked at the beginning of the function
-				username: event.locals.user.username,
-				pubkey: keys.pubkey,
-				psk: keys.psk,
-				allowedIps: getAllowedIps(ipAllocationId - 1),
+	switch (res._tag) {
+		case 'ok': {
+			return new Response(null, {
+				status: 201,
 			});
-			const opnsenseResJson = await opnsenseRes.json();
-			if (opnsenseResJson['result'] !== 'saved') {
-				tx2.rollback();
-				console.error(`Error creating client in OPNsense: \n${opnsenseResJson}`);
-				return error(500, 'Error creating client in OPNsense');
-			}
-
-			// create new client in db
-			const [newClient] = await tx2
-				.insert(wgClients)
-				.values({
-					// @ts-expect-error event.locals.user is checked at the beginning of the function
-					userId: event.locals.user.id,
-					name: 'New Client',
-					publicKey: keys.pubkey,
-					privateKey: keys.privkey,
-					preSharedKey: keys.psk,
-				})
-				.returning({ id: wgClients.id });
-
-			// update IP allocation with client ID
-			await tx2
-				.update(ipAllocations)
-				.set({ clientId: newClient.id })
-				.where(eq(ipAllocations.id, ipAllocationId));
-
-			// reconfigure opnsense
-			await opnsenseReconfigure();
-		});
-
-	});
-	return err?? new Response(null, { status: 201 });
+		}
+		case 'err': {
+			const [status, message] = res.error;
+			return error(status, message);
+		}
+	}
 };
-
-async function getKeys() {
-	// fetch key pair from opnsense
-	const options: RequestInit = {
-		method: 'GET',
-		headers: {
-			Authorization: opnsenseAuth,
-			Accept: 'application/json',
-		},
-	};
-	const resKeyPair = await fetch(`${opnsenseUrl}/api/wireguard/server/key_pair`, options);
-	const resPsk = await fetch(`${opnsenseUrl}/api/wireguard/client/psk`, options);
-	const keyPair = await resKeyPair.json();
-	const psk = await resPsk.json();
-	return {
-		pubkey: keyPair['pubkey'] as string,
-		privkey: keyPair['privkey'] as string,
-		psk: psk['psk'] as string,
-	};
-}
-
-function getAllowedIps(ipIndex: number) {
-	const v4StartingAddr = new Address4(IPV4_STARTING_ADDR);
-	const v6StartingAddr = new Address6(IPV6_STARTING_ADDR);
-	const v4Allowed = Address4.fromBigInt(v4StartingAddr.bigInt() + BigInt(ipIndex));
-	const v6Offset = BigInt(ipIndex) << (128n - BigInt(IPV6_CLIENT_PREFIX_SIZE));
-	const v6Allowed = Address6.fromBigInt(v6StartingAddr.bigInt() + v6Offset);
-	const v6AllowedShort = v6Allowed.parsedAddress.join(':');
-
-	return `${v4Allowed.address}/32,${v6AllowedShort}/${IPV6_CLIENT_PREFIX_SIZE}`;
-}
-
-async function opnsenseCreateClient(params: {
-	username: string;
-	pubkey: string;
-	psk: string;
-	allowedIps: string;
-}) {
-	return fetch(`${opnsenseUrl}/api/wireguard/client/addClientBuilder`, {
-		method: 'POST',
-		headers: {
-			Authorization: opnsenseAuth,
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			configbuilder: {
-				enabled: '1',
-				name: `vpgen-${params.username}`,
-				pubkey: params.pubkey,
-				psk: params.psk,
-				tunneladdress: params.allowedIps,
-				server: serverUuid,
-				endpoint: VPN_ENDPOINT,
-			},
-		}),
-	});
-}
-
-async function opnsenseReconfigure() {
-	return fetch(`${opnsenseUrl}/api/wireguard/service/reconfigure`, {
-		method: 'POST',
-		headers: {
-			Authorization: opnsenseAuth,
-			Accept: 'application/json',
-		},
-	});
-}

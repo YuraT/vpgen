@@ -23,7 +23,7 @@
 		{/if}
 	</nav>
 </header>
-<main class="flex-grow p-4">
+<main class="flex flex-col flex-grow p-4">
 	{@render children()}
 </main>
 
