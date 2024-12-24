@@ -25,6 +25,7 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"@types/better-sqlite3": "^7.6.11",
 		"@types/eslint": "^9.6.0",
+		"@types/qrcode-svg": "^1.1.5",
 		"autoprefixer": "^10.4.20",
 		"bits-ui": "^0.21.16",
 		"clsx": "^2.1.1",
@@ -52,6 +53,7 @@
 		"arctic": "^2.2.1",
 		"drizzle-orm": "^0.38.2",
 		"ip-address": "^10.0.1",
-		"lucide-svelte": "^0.454.0"
+		"lucide-svelte": "^0.454.0",
+		"qrcode-svg": "^1.1.0"
 	}
 }
