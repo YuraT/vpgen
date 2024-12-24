@@ -3,15 +3,7 @@ import { db } from '$lib/server/db';
 import { wgClients, ipAllocations } from '$lib/server/db/schema';
 import { opnsenseAuth, opnsenseUrl, serverPublicKey, serverUuid } from '$lib/server/opnsense';
 import { Address4, Address6 } from 'ip-address';
-import {
-	IP_MAX_INDEX,
-	IPV4_STARTING_ADDR,
-	IPV6_CLIENT_PREFIX_SIZE,
-	IPV6_STARTING_ADDR,
-	MAX_CLIENTS_PER_USER,
-	VPN_DNS,
-	VPN_ENDPOINT,
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { and, count, eq, isNull } from 'drizzle-orm';
 import { err, ok, type Result } from '$lib/types';
 import type { ClientDetails } from '$lib/types/clients';
@@ -60,8 +52,8 @@ export function mapClientToDetails(
 		preSharedKey: client.preSharedKey,
 		ips,
 		vpnPublicKey: serverPublicKey,
-		vpnEndpoint: VPN_ENDPOINT,
-		vpnDns: VPN_DNS,
+		vpnEndpoint: env.VPN_ENDPOINT,
+		vpnDns: env.VPN_DNS,
 	};
 }
 
@@ -74,7 +66,7 @@ export async function createClient(params: {
 		.select({ clientCount: count() })
 		.from(wgClients)
 		.where(eq(wgClients.userId, params.user.id));
-	if (clientCount >= parseInt(MAX_CLIENTS_PER_USER))
+	if (clientCount >= parseInt(env.MAX_CLIENTS_PER_USER))
 		return err([400, 'Maximum number of clients reached'] as [400, string]);
 
 	// this is going to be quite long
@@ -105,7 +97,7 @@ export async function createClient(params: {
 		]);
 
 		// check for existing allocation or if we have any IPs left
-		if (!availableAllocation && lastAllocation && lastAllocation.id >= parseInt(IP_MAX_INDEX)) {
+		if (!availableAllocation && lastAllocation && lastAllocation.id >= parseInt(env.IP_MAX_INDEX)) {
 			return err([500, 'No more IP addresses available'] as [500, string]);
 		}
 
@@ -179,14 +171,14 @@ async function getKeys() {
 
 export function getIpsFromIndex(ipIndex: number) {
 	ipIndex -= 1; // 1-indexed in the db
-	const v4StartingAddr = new Address4(IPV4_STARTING_ADDR);
-	const v6StartingAddr = new Address6(IPV6_STARTING_ADDR);
+	const v4StartingAddr = new Address4(env.IPV4_STARTING_ADDR);
+	const v6StartingAddr = new Address6(env.IPV6_STARTING_ADDR);
 	const v4Allowed = Address4.fromBigInt(v4StartingAddr.bigInt() + BigInt(ipIndex));
-	const v6Offset = BigInt(ipIndex) << (128n - BigInt(IPV6_CLIENT_PREFIX_SIZE));
+	const v6Offset = BigInt(ipIndex) << (128n - BigInt(env.IPV6_CLIENT_PREFIX_SIZE));
 	const v6Allowed = Address6.fromBigInt(v6StartingAddr.bigInt() + v6Offset);
 	const v6AllowedShort = v6Allowed.parsedAddress.join(':');
 
-	return [v4Allowed.address + '/32', v6AllowedShort + '/' + IPV6_CLIENT_PREFIX_SIZE];
+	return [v4Allowed.address + '/32', v6AllowedShort + '/' + env.IPV6_CLIENT_PREFIX_SIZE];
 }
 
 async function opnsenseCreateClient(params: {
@@ -210,7 +202,7 @@ async function opnsenseCreateClient(params: {
 				psk: params.psk,
 				tunneladdress: params.allowedIps,
 				server: serverUuid,
-				endpoint: VPN_ENDPOINT,
+				endpoint: env.VPN_ENDPOINT,
 			},
 		}),
 	});

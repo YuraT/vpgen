@@ -34,7 +34,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
 			status: 400
 		});
 	}
-	const claims = decodeIdToken(tokens.idToken());
+	const claims = decodeIdToken(tokens.idToken()) as { sub: string, preferred_username: string, name: string };
 	console.log("claims", claims);
 	const userId: string = claims.sub;
 	const username: string = claims.preferred_username;
