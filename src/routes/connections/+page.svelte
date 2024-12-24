@@ -33,22 +33,24 @@
 	<title>Connections</title>
 </svelte:head>
 
-<Table.Root class="bg-accent rounded-xl">
+<Table.Root class="bg-accent rounded-lg overflow-hidden divide-y-2 divide-background">
 	<Table.Header>
-		<Table.Head>Name</Table.Head>
-		<Table.Head>Public Key</Table.Head>
-		<Table.Head>Endpoint</Table.Head>
-		<Table.Head>Allowed IPs</Table.Head>
-		<Table.Head>Latest Handshake</Table.Head>
-		<Table.Head>RX</Table.Head>
-		<Table.Head>TX</Table.Head>
-		<Table.Head class="hidden">Persistent Keepalive</Table.Head>
-		<Table.Head class="hidden">Interface Name</Table.Head>
+		<Table.Row>
+			<Table.Head scope="col">Name</Table.Head>
+			<Table.Head scope="col">Public Key</Table.Head>
+			<Table.Head scope="col">Endpoint</Table.Head>
+			<Table.Head scope="col">Allowed IPs</Table.Head>
+			<Table.Head scope="col">Latest Handshake</Table.Head>
+			<Table.Head scope="col">RX</Table.Head>
+			<Table.Head scope="col">TX</Table.Head>
+			<Table.Head scope="col" class="hidden">Persistent Keepalive</Table.Head>
+			<Table.Head scope="col" class="hidden">Interface Name</Table.Head>
+		</Table.Row>
 	</Table.Header>
-	<Table.Body>
+	<Table.Body class="divide-y-2 divide-background">
 		{#each data.peers.rows as peer}
-			<Table.Row class="border-y-2 border-background">
-				<Table.Cell>{peer.name}</Table.Cell>
+			<Table.Row class="hover:bg-background hover:bg-opacity-40">
+				<Table.Head scope="row">{peer.name}</Table.Head>
 				<Table.Cell class="truncate max-w-[10ch]">{peer['public-key']}</Table.Cell>
 				<Table.Cell>{peer.endpoint}</Table.Cell>
 				<Table.Cell>

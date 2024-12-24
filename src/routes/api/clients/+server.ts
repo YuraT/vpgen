@@ -1,9 +1,6 @@
 import { error } from '@sveltejs/kit';
-import { wgClients } from '$lib/server/db/schema';
-import { db } from '$lib/server/db';
-import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
-import { createClient, getIpsFromIndex } from '$lib/server/clients';
+import { createClient, findClients, mapClientToDetails } from '$lib/server/clients';
 
 export const GET: RequestHandler = async (event) => {
 	if (!event.locals.user) {
@@ -13,38 +10,11 @@ export const GET: RequestHandler = async (event) => {
 	const clients = await findClients(event.locals.user.id);
 	return new Response(
 		JSON.stringify({
-			clients,
+			clients: clients.map(mapClientToDetails),
 		}),
 	);
 };
 
-async function findClients(userId: string) {
-	const clientsData = await db.query.wgClients.findMany({
-		columns: {
-			id: true,
-			name: true,
-			publicKey: true,
-			privateKey: true,
-			preSharedKey: true,
-		},
-		with: {
-			ipAllocation: true,
-		},
-		where: eq(wgClients.userId, userId),
-	});
-	// replace ip index with actual addresses
-	return clientsData.map((client) => {
-		const ips = getIpsFromIndex(client.ipAllocation.id);
-		return {
-			id: client.id,
-			name: client.name,
-			publicKey: client.publicKey,
-			privateKey: client.privateKey,
-			preSharedKey: client.preSharedKey,
-			ips,
-		};
-	});
-}
 
 export type Clients = Awaited<ReturnType<typeof findClients>>;
 

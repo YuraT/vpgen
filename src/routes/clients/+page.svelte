@@ -2,6 +2,7 @@
 	import * as Table from '$lib/components/ui/table';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
 	import type { PageData } from './$types';
 	import { LucidePlus } from 'lucide-svelte';
 
@@ -12,26 +13,28 @@
 	<title>Clients</title>
 </svelte:head>
 
-<Table.Root class="bg-accent rounded-xl">
+<Table.Root class="bg-accent rounded-lg overflow-hidden divide-y-2 divide-background">
 	<Table.Header>
-		<Table.Head>Name</Table.Head>
-		<Table.Head>Public Key</Table.Head>
-		<Table.Head>Private Key</Table.Head>
-		<Table.Head>Pre-Shared Key</Table.Head>
-		<Table.Head>IP Allocation</Table.Head>
+		<Table.Row>
+			<Table.Head scope="col">Name</Table.Head>
+			<Table.Head scope="col">Public Key</Table.Head>
+<!--			<Table.Head scope="col">Private Key</Table.Head>-->
+<!--			<Table.Head scope="col">Pre-Shared Key</Table.Head>-->
+			<Table.Head scope="col">IP Allocation</Table.Head>
+		</Table.Row>
 	</Table.Header>
-	<Table.Body>
+	<Table.Body class="divide-y-2 divide-background">
 		{#each data.clients as client}
-			<Table.Row class="border-y-2 border-background hover:bg-muted-foreground">
-				<a href={`/clients/${client.id}`} class="contents">
-					<Table.Cell>
+			<Table.Row class="hover:bg-background hover:bg-opacity-40 group">
+				<Table.Head scope="row">
+					<a href={`/clients/${client.id}`} class="flex items-center size-full group-hover:underline">
 						{client.name}
-					</Table.Cell>
-				</a>
-				<Table.Cell class="truncate max-w-[10ch]">{client.publicKey}</Table.Cell>
-				<Table.Cell class="truncate max-w-[10ch]">{client.privateKey}</Table.Cell>
-				<Table.Cell class="truncate max-w-[10ch]">{client.preSharedKey}</Table.Cell>
-				<Table.Cell class="flex gap-1">
+					</a>
+				</Table.Head>
+				<Table.Cell class="truncate">{client.publicKey}</Table.Cell>
+<!--				<Table.Cell class="truncate max-w-[10ch]">{client.privateKey}</Table.Cell>-->
+<!--				<Table.Cell class="truncate max-w-[10ch]">{client.preSharedKey}</Table.Cell>-->
+				<Table.Cell class="flex flex-wrap gap-1">
 					{#each client.ips as ip}
 						<Badge class="bg-background select-auto" variant="secondary">{ip}</Badge>
 					{/each}
@@ -42,9 +45,11 @@
 </Table.Root>
 
 <!--Floating action button for adding a new client-->
-<form class="self-end mt-auto pt-4" method="post" action="?/create">
+<!--Not sure if this is the best place for the input field, will think about it later-->
+<form class="flex self-end mt-auto pt-4" method="post" action="?/create">
+	<Input type="text" name="name" placeholder="New Client" class="mr-2" />
 	<Button type="submit">
-		<LucidePlus />
+		<LucidePlus class="mr-2 h-4 w-4" />
 		Add Client
 	</Button>
 </form>

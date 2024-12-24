@@ -31,14 +31,17 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 };
 
 
-const authRequired = new Set([
-	'/user',
-	'/connections',
-	'/api/connections',
-]);
+const authRequired = [
+	/^\/api/,
+	/^\/user/,
+	/^\/connections/,
+	/^\/clients/,
+];
 const handleProtectedPaths: Handle = ({ event, resolve }) => {
-	if (authRequired.has(event.url.pathname) && !event.locals.user) {
-		return redirect(302, '/');
+	const isProtected = authRequired.some((re) => re.test(event.url.pathname));
+
+	if (!event.locals.user && isProtected) {
+			return redirect(302, '/');
 	}
 	return resolve(event);
 }

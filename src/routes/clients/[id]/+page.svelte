@@ -1,19 +1,19 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { LucideClipboardCopy } from 'lucide-svelte';
+	import { Button } from '$lib/components/ui/button';
 
 	const { data }: { data: PageData } = $props();
 
 	let tooltipText = $state('Copy to clipboard');
 
-	function copyToClipboard() {
-		navigator.clipboard.writeText(data.config).then(() => {
-			tooltipText = 'Copied';
-		});
+	async function copyToClipboard() {
+		await navigator.clipboard.writeText(data.config);
+		tooltipText = 'Copied!';
 	}
 
 	function onMouseLeave() {
-		tooltipText = 'Copy to Clipboard';
+		tooltipText = 'Copy to clipboard';
 	}
 </script>
 
@@ -21,21 +21,24 @@
 	<title></title>
 </svelte:head>
 
-<h1>Client: {data.client.name}</h1>
+<h1 class="bg-accent text-lg w-fit rounded-lg p-2 mb-4">{data.client.name}</h1>
 
-<div class="flex relative bg-accent p-2 rounded-xl overflow-x-scroll">
-	<pre><code>{data.config}</code></pre>
+<div class="relative bg-accent rounded-lg max-w-fit">
+	<div class="flex items-start p-2 overflow-x-auto">
+		<pre><code>{data.config}</code></pre>
 
-	<!--Copy button for the configuration-->
-	<div class="absolute flex right-2 items-center group">
-		<span class="hidden group-hover:block bg-background text-xs rounded py-1 px-2">
-			{tooltipText}
-		</span>
-		<button class="flex items-center justify-center w-10 h-10 bg-background rounded-xl ml-2"
-						onclick={copyToClipboard}
-						onmouseleave="{onMouseLeave}"
-		>
-			<LucideClipboardCopy />
-		</button>
+		<!--Copy button for the configuration-->
+		<!--Flex reverse for peer hover to work properly-->
+		<div class="absolute group flex flex-row-reverse items-center gap-1 right-2">
+			<Button class="peer size-10 p-2"
+							onclick={copyToClipboard}
+							onmouseleave={onMouseLeave}
+			>
+				<LucideClipboardCopy />
+			</Button>
+			<span class="hidden peer-hover:block bg-background text-xs rounded-lg p-2">
+				{tooltipText}
+			</span>
+		</div>
 	</div>
 </div>

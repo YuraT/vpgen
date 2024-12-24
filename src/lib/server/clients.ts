@@ -140,7 +140,7 @@ export async function createClient(params: {
 				username: params.user.username,
 				pubkey: keys.pubkey,
 				psk: keys.psk,
-				allowedIps: getIpsFromIndex(ipAllocationId - 1).join(','),
+				allowedIps: getIpsFromIndex(ipAllocationId).join(','),
 			});
 			const opnsenseResJson = await opnsenseRes.json();
 			if (opnsenseResJson['result'] !== 'saved') {
@@ -178,6 +178,7 @@ async function getKeys() {
 }
 
 export function getIpsFromIndex(ipIndex: number) {
+	ipIndex -= 1; // 1-indexed in the db
 	const v4StartingAddr = new Address4(IPV4_STARTING_ADDR);
 	const v6StartingAddr = new Address6(IPV6_STARTING_ADDR);
 	const v4Allowed = Address4.fromBigInt(v4StartingAddr.bigInt() + BigInt(ipIndex));

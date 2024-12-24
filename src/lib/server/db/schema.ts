@@ -26,7 +26,7 @@ export const ipAllocations = sqliteTable('ip_allocations', {
 	// unique for now, only allowing one allocation per client
 	clientId: integer('client_id')
 		.unique()
-		.references(() => wgClients.id),
+		.references(() => wgClients.id, { onDelete: 'set null' }),
 });
 
 export const wgClients = sqliteTable('wg_clients', {
