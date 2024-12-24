@@ -1,7 +1,11 @@
 import { type Handle, redirect } from '@sveltejs/kit';
+import { sequence } from '@sveltejs/kit/hooks';
 import { dev } from '$app/environment';
 import * as auth from '$lib/server/auth';
-import { sequence } from '@sveltejs/kit/hooks';
+import { fetchOpnsenseServer } from '$lib/server/opnsense';
+
+// fetch opnsense server info on startup
+await fetchOpnsenseServer();
 
 const handleAuth: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get(auth.sessionCookieName);

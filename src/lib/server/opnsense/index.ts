@@ -12,33 +12,38 @@ export const opnsenseIfname = env.OPNSENSE_WG_IFNAME;
 // unset secret for security
 if (!dev) env.OPNSENSE_API_SECRET = '';
 
+export let serverUuid: string, serverPublicKey: string;
+
+export async function fetchOpnsenseServer() {
 // this might be pretty bad if the server is down and in a bunch of other cases
 // TODO: write a retry loop later
-const resServers = await fetch(`${opnsenseUrl}/api/wireguard/client/list_servers`, {
-	method: 'GET',
-	headers: {
-		Authorization: opnsenseAuth,
-		Accept: 'application/json',
-	},
-});
-assert(resServers.ok, 'Failed to fetch OPNsense WireGuard servers');
-const servers = (await resServers.json()) as OpnsenseWgServers;
-assert.equal(servers.status, 'ok', 'Failed to fetch OPNsense WireGuard servers');
-export const serverUuid = servers.rows.find((server) => server.name === opnsenseIfname)?.uuid;
-assert(serverUuid, 'Failed to find server UUID for OPNsense WireGuard server');
-console.log('OPNsense WireGuard server UUID:', serverUuid);
-
-const resServerInfo = await fetch(
-	`${opnsenseUrl}/api/wireguard/client/get_server_info/${serverUuid}`,
-	{
+	const resServers = await fetch(`${opnsenseUrl}/api/wireguard/client/list_servers`, {
 		method: 'GET',
 		headers: {
 			Authorization: opnsenseAuth,
 			Accept: 'application/json',
 		},
-	},
-);
-assert(resServerInfo.ok, 'Failed to fetch OPNsense WireGuard server info');
-const serverInfo = await resServerInfo.json();
-assert.equal(serverInfo.status, 'ok', 'Failed to fetch OPNsense WireGuard server info');
-export const serverPublicKey = serverInfo['pubkey'];
+	});
+	assert(resServers.ok, 'Failed to fetch OPNsense WireGuard servers');
+	const servers = (await resServers.json()) as OpnsenseWgServers;
+	assert.equal(servers.status, 'ok', 'Failed to fetch OPNsense WireGuard servers');
+	const uuid = servers.rows.find((server) => server.name === opnsenseIfname)?.uuid;
+	assert(uuid, 'Failed to find server UUID for OPNsense WireGuard server');
+	serverUuid = uuid;
+	console.log('OPNsense WireGuard server UUID:', serverUuid);
+
+	const resServerInfo = await fetch(
+		`${opnsenseUrl}/api/wireguard/client/get_server_info/${serverUuid}`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: opnsenseAuth,
+				Accept: 'application/json',
+			},
+		},
+	);
+	assert(resServerInfo.ok, 'Failed to fetch OPNsense WireGuard server info');
+	const serverInfo = await resServerInfo.json();
+	assert.equal(serverInfo.status, 'ok', 'Failed to fetch OPNsense WireGuard server info');
+	serverPublicKey = serverInfo['pubkey'];
+}
