@@ -1,6 +1,6 @@
 import type { User } from '$lib/server/db/schema';
+import { ipAllocations, wgClients } from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
-import { wgClients, ipAllocations } from '$lib/server/db/schema';
 import { opnsenseAuth, opnsenseUrl, serverPublicKey, serverUuid } from '$lib/server/opnsense';
 import { Address4, Address6 } from 'ip-address';
 import { env } from '$env/dynamic/private';
@@ -60,7 +60,7 @@ export function mapClientToDetails(
 export async function createClient(params: {
 	name: string;
 	user: User;
-}): Promise<Result<null, [400 | 500, string]>> {
+}): Promise<Result<number, [400 | 500, string]>> {
 	// check if user exceeds the limit of clients
 	const [{ clientCount }] = await db
 		.select({ clientCount: count() })
@@ -76,7 +76,7 @@ export async function createClient(params: {
 	// 2.3. update the allocation with the client id
 	// 3. create the client in opnsense
 	// 4. reconfigure opnsense to enable the new client
-	const error = await db.transaction(async (tx) => {
+	return await db.transaction(async (tx) => {
 		const [keys, availableAllocation, lastAllocation] = await Promise.all([
 			// fetch params for new client from opnsense api
 			getKeys(),
@@ -143,10 +143,9 @@ export async function createClient(params: {
 
 			// reconfigure opnsense
 			await opnsenseReconfigure();
+			return ok(newClient.id);
 		});
 	});
-	if (error) return error;
-	return ok(null);
 }
 
 async function getKeys() {

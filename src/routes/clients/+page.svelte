@@ -1,14 +1,25 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { LucidePlus } from 'lucide-svelte';
-	import * as Dialog from "$lib/components/ui/dialog";
 	import type { PageData } from './$types';
 	import { Label } from '$lib/components/ui/label';
+	import { page } from '$app/state';
 
 	const { data }: { data: PageData } = $props();
+
+	let dialogOpen = $state(page.url.searchParams.has('add'));
+	let dialogVal = $state(page.url.searchParams.get('add') ?? '');
+
+	$effect(() => {
+		if (dialogOpen) page.url.searchParams.set('add', dialogVal);
+		else page.url.searchParams.delete('add');
+
+		window.history.replaceState(history.state, '', page.url);
+	});
 </script>
 
 <svelte:head>
@@ -52,24 +63,33 @@
 <!--Floating action button for adding a new client-->
 <!--Not sure if this is the best place for the input field, will think about it later-->
 <div class="mt-auto flex self-end pt-4">
-	<Dialog.Root>
-		<Dialog.Trigger>
-			<Button>
+	<Dialog.Root bind:open={dialogOpen}>
+		<Dialog.Trigger asChild let:builder>
+			<Button builders={[builder]}>
 				<LucidePlus class="mr-2 h-4 w-4" />
 				Add Client
 			</Button>
 		</Dialog.Trigger>
 		<Dialog.Content class="max-w-xs">
 			<form class="contents" method="post" action="?/create">
-			<Dialog.Header class="">
-				<Dialog.Title>Create a new client</Dialog.Title>
-			</Dialog.Header>
-			<div class="flex flex-wrap items-center justify-between gap-4">
-				<Label for="name">Name</Label>
-				<Input required pattern=".*[^\s]+.*" type="text" name="name" placeholder="New Client" class="max-w-[20ch]" /></div>
-			<Dialog.Footer>
-				<Button type="submit">Create</Button>
-			</Dialog.Footer>
+				<Dialog.Header class="">
+					<Dialog.Title>Create a new client</Dialog.Title>
+				</Dialog.Header>
+				<div class="flex flex-wrap items-center justify-between gap-4">
+					<Label for="name">Name</Label>
+					<Input
+						bind:value={dialogVal}
+						required
+						pattern=".*[^\s]+.*"
+						type="text"
+						name="name"
+						placeholder="New Client"
+						class="max-w-[20ch]"
+					/>
+				</div>
+				<Dialog.Footer>
+					<Button type="submit">Create</Button>
+				</Dialog.Footer>
 			</form>
 		</Dialog.Content>
 	</Dialog.Root>

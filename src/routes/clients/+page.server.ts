@@ -1,6 +1,6 @@
 import type { Actions } from './$types';
 import { createClient } from '$lib/server/clients';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
 export const actions = {
 	create: async (event) => {
@@ -15,9 +15,7 @@ export const actions = {
 
 		switch (res._tag) {
 			case 'ok': {
-				return {
-					status: 201,
-				};
+				return redirect(303, `/clients/${res.value}`);
 			}
 			case 'err': {
 				const [status, message] = res.error;
