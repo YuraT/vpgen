@@ -4,7 +4,9 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { LucidePlus } from 'lucide-svelte';
+	import * as Dialog from "$lib/components/ui/dialog";
 	import type { PageData } from './$types';
+	import { Label } from '$lib/components/ui/label';
 
 	const { data }: { data: PageData } = $props();
 </script>
@@ -49,10 +51,26 @@
 
 <!--Floating action button for adding a new client-->
 <!--Not sure if this is the best place for the input field, will think about it later-->
-<form class="mt-auto flex self-end pt-4" method="post" action="?/create">
-	<Input required type="text" name="name" placeholder="New Client" class="mr-2" />
-	<Button type="submit">
-		<LucidePlus class="mr-2 h-4 w-4" />
-		Add Client
-	</Button>
-</form>
+<div class="mt-auto flex self-end pt-4">
+	<Dialog.Root>
+		<Dialog.Trigger>
+			<Button>
+				<LucidePlus class="mr-2 h-4 w-4" />
+				Add Client
+			</Button>
+		</Dialog.Trigger>
+		<Dialog.Content class="max-w-xs">
+			<form class="contents" method="post" action="?/create">
+			<Dialog.Header class="">
+				<Dialog.Title>Create a new client</Dialog.Title>
+			</Dialog.Header>
+			<div class="flex flex-wrap items-center justify-between gap-4">
+				<Label for="name">Name</Label>
+				<Input required pattern=".*[^\s]+.*" type="text" name="name" placeholder="New Client" class="max-w-[20ch]" /></div>
+			<Dialog.Footer>
+				<Button type="submit">Create</Button>
+			</Dialog.Footer>
+			</form>
+		</Dialog.Content>
+	</Dialog.Root>
+</div>
