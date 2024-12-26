@@ -2,7 +2,7 @@
 	import * as Table from '$lib/components/ui/table';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { LucidePlus } from 'lucide-svelte';
 	import type { PageData } from './$types';
@@ -64,11 +64,9 @@
 <!--Not sure if this is the best place for the input field, will think about it later-->
 <div class="mt-auto flex self-end pt-4">
 	<Dialog.Root bind:open={dialogOpen}>
-		<Dialog.Trigger asChild let:builder>
-			<Button builders={[builder]}>
-				<LucidePlus class="mr-2 h-4 w-4" />
-				Add Client
-			</Button>
+		<Dialog.Trigger class={buttonVariants({ variant: "default" }) + "flex gap-4"}>
+			<LucidePlus />
+			Add Client
 		</Dialog.Trigger>
 		<Dialog.Content class="max-w-xs">
 			<form class="contents" method="post" action="?/create">

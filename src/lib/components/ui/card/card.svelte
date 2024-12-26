@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { HTMLTdAttributes } from "svelte/elements";
 	import type { WithElementRef } from "bits-ui";
+	import type { HTMLAttributes } from "svelte/elements";
 	import { cn } from "$lib/utils.js";
 
 	let {
@@ -8,13 +8,13 @@
 		class: className,
 		children,
 		...restProps
-	}: WithElementRef<HTMLTdAttributes> = $props();
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
 </script>
 
-<td
+<div
 	bind:this={ref}
-	class={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
+	class={cn("bg-card text-card-foreground rounded-lg border shadow-sm", className)}
 	{...restProps}
 >
 	{@render children?.()}
-</td>
+</div>
