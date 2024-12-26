@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { AuthForm } from '$lib/components/app/auth-form';
 	import { Button } from '$lib/components/ui/button';
+	import { AuthForm } from '$lib/components/app/auth-form';
 
 	const { data } = $props();
 	const { user } = data;
@@ -24,6 +24,15 @@
 			<Button class="ml-2 p-2" href="/clients?add=New+Client">Create a New Client</Button>
 		</p>
 	</section>
+	<!--	<section id="using-wireguard">-->
+	<!--		<details class="mt-10">-->
+	<!--			<summary class="relative flex flex-col gap-2 pl-10">-->
+	<!--				<h2 class="text-xl font-semibold">Using WireGuard</h2>-->
+	<!--				To use VPGen, you need to install the WireGuard app on your device.-->
+	<!--			</summary>-->
+	<!--			<WireguardGuide />-->
+	<!--		</details>-->
+	<!--	</section>-->
 {:else}
 	<AuthForm class="p-4" />
 	<p>VPGen is a VPN generator that allows you to create and manage VPN connections.</p>
@@ -33,4 +42,14 @@
 	p {
 		@apply my-2;
 	}
+
+	/*
+	summary::before {
+		content: '▶';
+		@apply absolute -left-0;
+	}
+	details[open] summary::before {
+		content: '▼';
+	}
+	*/
 </style>
