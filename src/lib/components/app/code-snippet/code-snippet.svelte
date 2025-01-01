@@ -22,10 +22,9 @@
 	}
 </script>
 
-<div class="relative max-w-fit overflow-x-hidden rounded-lg bg-accent">
+<div class="relative flex-grow overflow-x-hidden rounded-lg bg-accent">
 	<div class="flex items-start overflow-x-auto p-2">
 		<pre><code>{data}</code></pre>
-
 		{#if copy || download}
 			<!--Copy button-->
 			<!--Flex reverse for peer hover to work properly-->

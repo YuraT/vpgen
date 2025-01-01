@@ -5,7 +5,7 @@
 	import guideVideo from '$lib/assets/guide-client.mp4';
 </script>
 
-<Tabs.Root value="android" class="max-w-xl">
+<Tabs.Root value="android">
 	<Tabs.List class="grid w-full grid-cols-3">
 		<Tabs.Trigger value="android">Android</Tabs.Trigger>
 		<Tabs.Trigger value="windows">Windows</Tabs.Trigger>
@@ -35,7 +35,7 @@
 						<div class="flex flex-col gap-2">
 							<p>Download the configuration file and import it</p>
 							<aside>Alternatively, you can scan the QR code with the WireGuard app</aside>
-							<video controls muted preload="metadata" class="max-h-screen">
+							<video autoplay loop controls muted preload="metadata" class="max-h-screen">
 								<source src={guideVideo} type="video/mp4" />
 							</video>
 						</div>

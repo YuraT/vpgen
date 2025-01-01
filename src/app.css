@@ -99,11 +99,10 @@
 	}
 
 	ol > li {
-		@apply flex;
+		@apply flex flex-wrap gap-x-2;
 		counter-increment: counterName;
 	}
 	ol > li:before {
-		@apply mr-2;
 		content: counter(counterName) '.';
 	}
 }

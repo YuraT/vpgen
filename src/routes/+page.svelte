@@ -10,7 +10,7 @@
 	<title>VPGen</title>
 </svelte:head>
 
-<h1 class="mb-2 scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl">
+<h1 class="mb-2 scroll-m-20 text-center text-3xl font-extrabold tracking-tight lg:text-4xl">
 	Welcome to VPGen
 </h1>
 
@@ -21,7 +21,7 @@
 	<section id="get-started" class="border-l-2 pl-6">
 		<p>
 			To get started,
-			<Button class="ml-2 p-2" href="/clients?add=New+Client">Create a New Client</Button>
+			<Button class="ml-2" href="/clients?add=New+Client">Create a New Client</Button>
 		</p>
 	</section>
 	<!--	<section id="using-wireguard">-->
@@ -34,8 +34,8 @@
 	<!--		</details>-->
 	<!--	</section>-->
 {:else}
-	<AuthForm class="p-4" />
-	<p>VPGen is a VPN generator that allows you to create and manage VPN connections.</p>
+	<AuthForm />
+	<!--	<p>VPGen is a VPN generator that allows you to create and manage VPN connections.</p>-->
 {/if}
 
 <style>

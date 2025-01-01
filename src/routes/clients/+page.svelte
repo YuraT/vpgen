@@ -61,34 +61,33 @@
 </Table.Root>
 
 <!--Floating action button for adding a new client-->
-<!--Not sure if this is the best place for the input field, will think about it later-->
-<div class="mt-auto flex self-end pt-4">
-	<Dialog.Root bind:open={dialogOpen}>
-		<Dialog.Trigger class={buttonVariants({ variant: "default" }) + "flex gap-4"}>
+<Dialog.Root bind:open={dialogOpen}>
+	<div class="mt-auto flex self-end pt-4">
+		<Dialog.Trigger class={buttonVariants({ variant: 'default' }) + ' flex gap-4'}>
 			<LucidePlus />
-			Add Client
+			New Client
 		</Dialog.Trigger>
-		<Dialog.Content class="max-w-xs">
-			<form class="contents" method="post" action="?/create">
-				<Dialog.Header class="">
-					<Dialog.Title>Create a new client</Dialog.Title>
-				</Dialog.Header>
-				<div class="flex flex-wrap items-center justify-between gap-4">
-					<Label for="name">Name</Label>
-					<Input
-						bind:value={dialogVal}
-						required
-						pattern=".*[^\s]+.*"
-						type="text"
-						name="name"
-						placeholder="New Client"
-						class="max-w-[20ch]"
-					/>
-				</div>
-				<Dialog.Footer>
-					<Button type="submit">Create</Button>
-				</Dialog.Footer>
-			</form>
-		</Dialog.Content>
-	</Dialog.Root>
-</div>
+	</div>
+	<Dialog.Content class="max-w-xs">
+		<form class="contents" method="post" action="?/create">
+			<Dialog.Header class="">
+				<Dialog.Title>Create a new client</Dialog.Title>
+			</Dialog.Header>
+			<div class="flex flex-wrap items-center justify-between gap-4">
+				<Label for="name">Name</Label>
+				<Input
+					bind:value={dialogVal}
+					required
+					pattern=".*[^\s]+.*"
+					type="text"
+					name="name"
+					placeholder="New Client"
+					class="max-w-[20ch]"
+				/>
+			</div>
+			<Dialog.Footer>
+				<Button type="submit">Create</Button>
+			</Dialog.Footer>
+		</form>
+	</Dialog.Content>
+</Dialog.Root>

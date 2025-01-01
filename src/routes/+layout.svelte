@@ -14,10 +14,12 @@
 	}
 </script>
 
-<header class="sm:flex">
-	<span class=" mr-6 font-bold sm:inline-block">VPGen</span>
-	<nav>
-		<ul class="flex items-center gap-6 text-sm">
+<header class="flex w-full flex-wrap justify-between gap-x-6 gap-y-4 xl:max-w-screen-xl">
+	<a href="/" class="contents">
+		<span class="font-bold sm:inline-block">VPGen</span>
+	</a>
+	<nav class="max-w-full">
+		<ul class="flex items-center gap-6 overflow-x-auto text-sm">
 			<li><a href="/" class={getNavClass(/^\/$/)}>Home</a></li>
 			{#if user}
 				<li><a href="/user" class={getNavClass(/^\/user$/)}>Profile</a></li>
@@ -27,13 +29,16 @@
 		</ul>
 	</nav>
 </header>
-<main class="flex flex-grow flex-col gap-4">
+<main class="flex min-w-full max-w-full flex-grow flex-col gap-4 xl:min-w-[1280px]">
 	{@render children()}
 </main>
 
 <!--https://github.com/sveltejs/kit/discussions/7585#discussioncomment-9997936-->
 <!--Some shenanings needed to be done to get the footer position to stick correctly,
 didn't work with display: contents-->
-<footer class="relative inset-x-0 bottom-0 text-center">
+<footer class="inset-x-0 bottom-0 w-full text-center">
 	<p>&copy; 2024</p>
 </footer>
+
+<style>
+</style>

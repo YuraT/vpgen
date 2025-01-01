@@ -25,14 +25,14 @@
 
 <h1 class="w-fit rounded-lg bg-accent p-2 text-lg">{data.client.name}</h1>
 
-<section id="client-configuration" class="flex flex-wrap gap-4">
+<section id="client-configuration" class="flex flex-wrap justify-center gap-4">
 	<CodeSnippet data={data.config} filename={clientWgCleanedName} copy download />
 
 	<div class="overflow-hidden rounded-lg">
 		{@html qrCode.svg()}
 	</div>
 </section>
-<section id="usage" class="flex flex-col gap-2">
+<section id="usage" class="flex w-full flex-col gap-2">
 	<h2 class="text-xl font-semibold">Usage</h2>
 	<p>To use VPGen, you need to install the WireGuard app on your device.</p>
 	<WireguardGuide />
