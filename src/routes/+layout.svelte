@@ -29,7 +29,7 @@
 		</ul>
 	</nav>
 </header>
-<main class="flex min-w-full max-w-full flex-grow flex-col gap-4 xl:min-w-[1280px]">
+<main class="flex min-w-full max-w-full flex-grow flex-col gap-4 xl:min-w-[78rem]">
 	{@render children()}
 </main>
 

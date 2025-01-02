@@ -2,7 +2,7 @@
 	import type { PageData } from './$types';
 	import QRCode from 'qrcode-svg';
 	import { CodeSnippet } from '$lib/components/app/code-snippet';
-	import { WireguardGuide } from '$lib/components/app/wireguard-guide/index.js';
+	import { WireguardGuide } from '$lib/components/app/wireguard-guide';
 
 	const { data }: { data: PageData } = $props();
 
@@ -16,6 +16,8 @@
 		content: data.config,
 		join: true,
 		background: 'hsl(var(--accent-light))',
+		width: 296,
+		height: 296,
 	});
 </script>
 
@@ -25,10 +27,10 @@
 
 <h1 class="w-fit rounded-lg bg-accent p-2 text-lg">{data.client.name}</h1>
 
-<section id="client-configuration" class="flex flex-wrap justify-center gap-4">
+<section id="client-configuration" class="flex flex-wrap items-center justify-center gap-4">
 	<CodeSnippet data={data.config} filename={clientWgCleanedName} copy download />
 
-	<div class="overflow-hidden rounded-lg">
+	<div class="size-fit overflow-auto rounded-lg">
 		{@html qrCode.svg()}
 	</div>
 </section>

@@ -38,7 +38,7 @@
 	</Table.Header>
 	<Table.Body class="divide-y-2 divide-background">
 		{#each data.clients as client}
-			<Table.Row class="group hover:bg-background hover:bg-opacity-40">
+			<Table.Row class="hover:bg-surface group">
 				<Table.Head scope="row">
 					<a
 						href={`/clients/${client.id}`}

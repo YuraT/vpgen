@@ -17,13 +17,11 @@
 	});
 
 	function getSize(size: number) {
-		let sizes = ['Bytes', 'KiB', 'MiB', 'GiB',
-			'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+		let sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
 
 		for (let i = 1; i < sizes.length; i++) {
 			if (size < Math.pow(1024, i))
-				return (Math.round((size / Math.pow(
-					1024, i - 1)) * 100) / 100) + ' ' + sizes[i - 1];
+				return Math.round((size / Math.pow(1024, i - 1)) * 100) / 100 + ' ' + sizes[i - 1];
 		}
 		return size;
 	}
@@ -33,7 +31,7 @@
 	<title>Connections</title>
 </svelte:head>
 
-<Table.Root class="bg-accent rounded-lg overflow-hidden divide-y-2 divide-background">
+<Table.Root class="divide-y-2 divide-background overflow-hidden rounded-lg bg-accent">
 	<Table.Header>
 		<Table.Row>
 			<Table.Head scope="col">Name</Table.Head>
@@ -49,14 +47,14 @@
 	</Table.Header>
 	<Table.Body class="divide-y-2 divide-background">
 		{#each data.peers.rows as peer}
-			<Table.Row class="hover:bg-background hover:bg-opacity-40">
+			<Table.Row class="hover:bg-surface">
 				<Table.Head scope="row">{peer.name}</Table.Head>
-				<Table.Cell class="truncate max-w-[10ch]">{peer['public-key']}</Table.Cell>
+				<Table.Cell class="max-w-[10ch] truncate">{peer['public-key']}</Table.Cell>
 				<Table.Cell>{peer.endpoint}</Table.Cell>
 				<Table.Cell>
 					<div class="flex flex-wrap gap-1">
 						{#each peer['allowed-ips'].split(',') as addr}
-							<Badge class="bg-background select-auto" variant="secondary">{addr}</Badge>
+							<Badge class="select-auto bg-background" variant="secondary">{addr}</Badge>
 						{/each}
 					</div>
 				</Table.Cell>
