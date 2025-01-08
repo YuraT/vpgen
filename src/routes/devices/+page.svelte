@@ -4,7 +4,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { LucidePlus } from 'lucide-svelte';
+	import { LucideLoaderCircle, LucidePlus } from 'lucide-svelte';
 	import type { PageData } from './$types';
 	import { Label } from '$lib/components/ui/label';
 	import { page } from '$app/state';
@@ -13,6 +13,7 @@
 
 	let dialogOpen = $state(page.url.searchParams.has('add'));
 	let dialogVal = $state(page.url.searchParams.get('add') ?? '');
+	let submitted = $state(false);
 
 	$effect(() => {
 		if (dialogOpen) page.url.searchParams.set('add', dialogVal);
@@ -69,7 +70,7 @@
 		</Dialog.Trigger>
 	</div>
 	<Dialog.Content class="max-w-xs">
-		<form class="contents" method="post" action="?/create">
+		<form class="contents" method="post" onsubmit={() => submitted = true} action="?/create">
 			<Dialog.Header class="">
 				<Dialog.Title>Add a new device</Dialog.Title>
 			</Dialog.Header>
@@ -86,7 +87,12 @@
 				/>
 			</div>
 			<Dialog.Footer>
-				<Button type="submit">Add</Button>
+				<Button type="submit" disabled={submitted}>
+					{#if submitted}
+						<LucideLoaderCircle class="size-4 mr-2 animate-spin" />
+					{/if}
+					Add
+				</Button>
 			</Dialog.Footer>
 		</form>
 	</Dialog.Content>

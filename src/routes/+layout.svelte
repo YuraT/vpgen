@@ -37,7 +37,7 @@
 <!--Some shenanings needed to be done to get the footer position to stick correctly,
 didn't work with display: contents-->
 <footer class="inset-x-0 bottom-0 w-full text-center">
-	<p>&copy; 2024</p>
+	<p>&copy; 2025</p>
 </footer>
 
 <style>
