@@ -8,7 +8,7 @@ export const users = sqliteTable('users', {
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-	wgClients: many(wgClients),
+	devices: many(devices),
 }));
 
 export const sessions = sqliteTable('sessions', {
@@ -22,14 +22,14 @@ export const sessions = sqliteTable('sessions', {
 export const ipAllocations = sqliteTable('ip_allocations', {
 	// for now, id will be the same as the ipIndex
 	id: integer('id').primaryKey({ autoIncrement: true }),
-	// clientId is nullable because allocations can remain after the client is deleted
-	// unique for now, only allowing one allocation per client
-	clientId: integer('client_id')
+	// deviceId is nullable because allocations can remain after the device is deleted
+	// unique for now, only allowing one allocation per device
+	deviceId: integer('device_id')
 		.unique()
-		.references(() => wgClients.id, { onDelete: 'set null' }),
+		.references(() => devices.id, { onDelete: 'set null' }),
 });
 
-export const wgClients = sqliteTable('wg_clients', {
+export const devices = sqliteTable('devices', {
 	id: integer().primaryKey({ autoIncrement: true }),
 	userId: text('user_id')
 		.notNull()
@@ -38,7 +38,7 @@ export const wgClients = sqliteTable('wg_clients', {
 	// questioning whether this should be nullable
 	opnsenseId: text('opnsense_id'),
 	publicKey: text('public_key').notNull().unique(),
-	// nullable for the possibility of a client supplying their own private key
+	// nullable for the possibility of a user supplying their own private key
 	privateKey: text('private_key'),
 	// nullable for the possibility of no psk
 	preSharedKey: text('pre_shared_key'),
@@ -48,18 +48,18 @@ export const wgClients = sqliteTable('wg_clients', {
 	// allowedIps: text('allowed_ips').notNull(),
 });
 
-export const wgClientsRelations = relations(wgClients, ({ one }) => ({
+export const devicesRelations = relations(devices, ({ one }) => ({
 	user: one(users, {
-		fields: [wgClients.userId],
+		fields: [devices.userId],
 		references: [users.id],
 	}),
 	ipAllocation: one(ipAllocations, {
-		fields: [wgClients.id],
-		references: [ipAllocations.clientId],
+		fields: [devices.id],
+		references: [ipAllocations.deviceId],
 	}),
 }));
 
-export type WgClient = typeof wgClients.$inferSelect;
+export type Device = typeof devices.$inferSelect;
 
 export type Session = typeof sessions.$inferSelect;
 

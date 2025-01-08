@@ -39,7 +39,7 @@ const authRequired = [
 	/^\/api/,
 	/^\/user/,
 	/^\/connections/,
-	/^\/clients/,
+	/^\/devices/,
 ];
 const handleProtectedPaths: Handle = ({ event, resolve }) => {
 	const isProtected = authRequired.some((re) => re.test(event.url.pathname));

@@ -21,7 +21,7 @@
 	<section id="get-started" class="border-l-2 pl-6">
 		<p>
 			To get started,
-			<Button class="ml-2" href="/clients?add=New+Client">Create a New Client</Button>
+			<Button class="ml-2" href="/devices?add=New+Device">Add a New Device</Button>
 		</p>
 	</section>
 	<!--	<section id="using-wireguard">-->

@@ -1,5 +1,5 @@
 import type { Actions } from './$types';
-import { createClient } from '$lib/server/clients';
+import { createDevice } from '$lib/server/devices';
 import { error, redirect } from '@sveltejs/kit';
 
 export const actions = {
@@ -8,14 +8,14 @@ export const actions = {
 		const formData = await event.request.formData();
 		const name = formData.get('name');
 		if (typeof name !== 'string' || name.trim() === '') return error(400, 'Invalid name');
-		const res = await createClient({
+		const res = await createDevice({
 			name: name.trim(),
 			user: event.locals.user,
 		});
 
 		switch (res._tag) {
 			case 'ok': {
-				return redirect(303, `/clients/${res.value}`);
+				return redirect(303, `/devices/${res.value}`);
 			}
 			case 'err': {
 				const [status, message] = res.error;

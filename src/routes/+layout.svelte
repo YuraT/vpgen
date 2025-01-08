@@ -24,7 +24,7 @@
 			{#if user}
 				<li><a href="/user" class={getNavClass(/^\/user$/)}>Profile</a></li>
 				<li><a href="/connections" class={getNavClass(/^\/connections$/)}>Connections</a></li>
-				<li><a href="/clients" class={getNavClass(/^\/clients(\/\d+)?$/)}>Clients</a></li>
+				<li><a href="/devices" class={getNavClass(/^\/devices(\/\d+)?$/)}>Devices</a></li>
 			{/if}
 		</ul>
 	</nav>

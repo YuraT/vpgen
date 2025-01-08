@@ -1,29 +1,29 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { createClient, findClients, mapClientToDetails } from '$lib/server/clients';
+import { createDevice, findDevices, mapDeviceToDetails } from '$lib/server/devices';
 
 export const GET: RequestHandler = async (event) => {
 	if (!event.locals.user) {
 		return error(401, 'Unauthorized');
 	}
 
-	const clients = await findClients(event.locals.user.id);
+	const devices = await findDevices(event.locals.user.id);
 	return new Response(
 		JSON.stringify({
-			clients: clients.map(mapClientToDetails),
+			devices: devices.map(mapDeviceToDetails),
 		}),
 	);
 };
 
 
-export type Clients = Awaited<ReturnType<typeof findClients>>;
+export type Devices = Awaited<ReturnType<typeof findDevices>>;
 
 export const POST: RequestHandler = async (event) => {
 	if (!event.locals.user) {
 		return error(401, 'Unauthorized');
 	}
 	const { name } = await event.request.json();
-	const res = await createClient({
+	const res = await createDevice({
 		name,
 		user: event.locals.user,
 	});

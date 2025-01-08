@@ -6,11 +6,11 @@
 
 	const { data }: { data: PageData } = $props();
 
-	// Clean the client name for the file name,
+	// Clean the device name for the wg config filename,
 	// things can break otherwise (too long or invalid characters)
 	// https://github.com/pirate/wireguard-docs
-	const clientWgCleanedName =
-		data.client.name.slice(0, 15).replace(/[^a-zA-Z0-9_=+.-]/g, '_') + '.conf';
+	const deviceWgCleanedName =
+		data.device.name.slice(0, 15).replace(/[^a-zA-Z0-9_=+.-]/g, '_') + '.conf';
 
 	let qrCode = new QRCode({
 		content: data.config,
@@ -22,13 +22,13 @@
 </script>
 
 <svelte:head>
-	<title>{data.client.name}</title>
+	<title>{data.device.name}</title>
 </svelte:head>
 
-<h1 class="w-fit rounded-lg bg-accent p-2 text-lg">{data.client.name}</h1>
+<h1 class="w-fit rounded-lg bg-accent p-2 text-lg">{data.device.name}</h1>
 
-<section id="client-configuration" class="flex flex-wrap items-center justify-center gap-4">
-	<CodeSnippet data={data.config} filename={clientWgCleanedName} copy download />
+<section id="device-configuration" class="flex flex-wrap items-center justify-center gap-4">
+	<CodeSnippet data={data.config} filename={deviceWgCleanedName} copy download />
 
 	<div class="size-fit overflow-auto rounded-lg">
 		{@html qrCode.svg()}

@@ -23,7 +23,7 @@
 </script>
 
 <svelte:head>
-	<title>Clients</title>
+	<title>Devices</title>
 </svelte:head>
 
 <Table.Root class="divide-y-2 divide-background overflow-hidden rounded-lg bg-accent">
@@ -37,21 +37,21 @@
 		</Table.Row>
 	</Table.Header>
 	<Table.Body class="divide-y-2 divide-background">
-		{#each data.clients as client}
+		{#each data.devices as device}
 			<Table.Row class="hover:bg-surface group">
 				<Table.Head scope="row">
 					<a
-						href={`/clients/${client.id}`}
+						href={`/devices/${device.id}`}
 						class="flex size-full items-center group-hover:underline"
 					>
-						{client.name}
+						{device.name}
 					</a>
 				</Table.Head>
-				<Table.Cell class="truncate">{client.publicKey}</Table.Cell>
-				<!--				<Table.Cell class="truncate max-w-[10ch]">{client.privateKey}</Table.Cell>-->
-				<!--				<Table.Cell class="truncate max-w-[10ch]">{client.preSharedKey}</Table.Cell>-->
+				<Table.Cell class="truncate">{device.publicKey}</Table.Cell>
+				<!--				<Table.Cell class="truncate max-w-[10ch]">{device.privateKey}</Table.Cell>-->
+				<!--				<Table.Cell class="truncate max-w-[10ch]">{device.preSharedKey}</Table.Cell>-->
 				<Table.Cell class="flex flex-wrap gap-1">
-					{#each client.ips as ip}
+					{#each device.ips as ip}
 						<Badge class="select-auto bg-background" variant="secondary">{ip}</Badge>
 					{/each}
 				</Table.Cell>
@@ -60,18 +60,18 @@
 	</Table.Body>
 </Table.Root>
 
-<!--Floating action button for adding a new client-->
+<!--Floating action button for adding a new device-->
 <Dialog.Root bind:open={dialogOpen}>
 	<div class="mt-auto flex self-end pt-4">
 		<Dialog.Trigger class={buttonVariants({ variant: 'default' }) + ' flex gap-4'}>
 			<LucidePlus />
-			New Client
+			New Device
 		</Dialog.Trigger>
 	</div>
 	<Dialog.Content class="max-w-xs">
 		<form class="contents" method="post" action="?/create">
 			<Dialog.Header class="">
-				<Dialog.Title>Create a new client</Dialog.Title>
+				<Dialog.Title>Add a new device</Dialog.Title>
 			</Dialog.Header>
 			<div class="flex flex-wrap items-center justify-between gap-4">
 				<Label for="name">Name</Label>
@@ -81,12 +81,12 @@
 					pattern=".*[^\s]+.*"
 					type="text"
 					name="name"
-					placeholder="New Client"
+					placeholder="New Device"
 					class="max-w-[20ch]"
 				/>
 			</div>
 			<Dialog.Footer>
-				<Button type="submit">Create</Button>
+				<Button type="submit">Add</Button>
 			</Dialog.Footer>
 		</form>
 	</Dialog.Content>

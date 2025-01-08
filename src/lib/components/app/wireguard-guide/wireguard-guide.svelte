@@ -2,7 +2,7 @@
 	import * as Tabs from '$lib/components/ui/tabs';
 	import * as Card from '$lib/components/ui/card';
 	import getItOnGooglePlay from '$lib/assets/GetItOnGooglePlay_Badge_Web_color_English.png';
-	import guideVideo from '$lib/assets/guide-client.mp4';
+	import guideVideoAndroid from '$lib/assets/guide-android.mp4';
 </script>
 
 <Tabs.Root value="android">
@@ -36,7 +36,7 @@
 							<p>Download the configuration file and import it</p>
 							<aside>Alternatively, you can scan the QR code with the WireGuard app</aside>
 							<video autoplay loop controls muted preload="metadata" class="max-h-screen">
-								<source src={guideVideo} type="video/mp4" />
+								<source src={guideVideoAndroid} type="video/mp4" />
 							</video>
 						</div>
 					</li>
