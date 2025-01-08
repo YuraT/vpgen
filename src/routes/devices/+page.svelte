@@ -42,7 +42,7 @@
 			<Table.Row class="hover:bg-surface group">
 				<Table.Head scope="row">
 					<a
-						href={`/devices/${device.id}`}
+						href="/devices/{device.id}"
 						class="flex size-full items-center group-hover:underline"
 					>
 						{device.name}

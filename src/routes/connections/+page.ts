@@ -1,9 +1,9 @@
 import type { PageLoad } from './$types';
-import type { OpnsenseWgPeers } from '$lib/opnsense/wg';
+import type { ConnectionDetails } from '$lib/connections';
 
 export const load: PageLoad = async ({ fetch }) => {
 	const res = await fetch('/api/connections');
-	const peers = await res.json() as OpnsenseWgPeers;
+	const connections = await res.json() as ConnectionDetails[];
 
-	return { peers };
+	return { connections };
 };
