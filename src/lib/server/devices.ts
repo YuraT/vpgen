@@ -7,6 +7,7 @@ import { env } from '$env/dynamic/private';
 import { and, count, eq, isNull } from 'drizzle-orm';
 import { err, ok, type Result } from '$lib/types';
 import type { DeviceDetails } from '$lib/devices';
+import { opnsenseSanitezedUsername } from '$lib/opnsense';
 
 export async function findDevices(userId: string) {
 	return db.query.devices.findMany({
@@ -196,7 +197,7 @@ async function opnsenseCreateClient(params: {
 		body: JSON.stringify({
 			configbuilder: {
 				enabled: '1',
-				name: `vpgen-${params.username}`,
+				name: `vpgen-${opnsenseSanitezedUsername(params.username)}`,
 				pubkey: params.pubkey,
 				psk: params.psk,
 				tunneladdress: params.allowedIps,

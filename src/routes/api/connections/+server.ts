@@ -4,6 +4,7 @@ import { opnsenseAuth, opnsenseUrl } from '$lib/server/opnsense';
 import type { OpnsenseWgPeers } from '$lib/opnsense/wg';
 import { findDevices } from '$lib/server/devices';
 import type { ConnectionDetails } from '$lib/connections';
+import { opnsenseSanitezedUsername } from '$lib/opnsense';
 
 export const GET: RequestHandler = async (event) => {
 	if (!event.locals.user) {
@@ -50,8 +51,7 @@ export const GET: RequestHandler = async (event) => {
 };
 
 async function fetchOpnsensePeers(username: string) {
-	const apiUrl = `${opnsenseUrl}/api/wireguard/service/show`;
-	const options: RequestInit = {
+	const res = await fetch(`${opnsenseUrl}/api/wireguard/service/show`, {
 		method: 'POST',
 		headers: {
 			Authorization: opnsenseAuth,
@@ -65,11 +65,9 @@ async function fetchOpnsensePeers(username: string) {
 			// TODO: use a more unique search phrase
 			// unfortunately 64 character limit,
 			// but it should be fine if users can't change their own username
-			searchPhrase: `vpgen-${username}`,
+			searchPhrase: `vpgen-${opnsenseSanitezedUsername(username)}`,
 			type: ['peer'],
 		}),
-	};
-
-	const res = await fetch(apiUrl, options);
+	});
 	return (await res.json()) as OpnsenseWgPeers;
 }
