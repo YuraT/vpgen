@@ -17,7 +17,7 @@
 	} = $props();
 </script>
 
-<Dialog.Portal {...portalProps}>
+<Dialog.Portal class="absolute" {...portalProps}>
 	<Dialog.Overlay />
 	<DialogPrimitive.Content
 		bind:ref
