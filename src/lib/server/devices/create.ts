@@ -1,62 +1,11 @@
-import type { User } from '$lib/server/db/schema';
-import { ipAllocations, devices } from '$lib/server/db/schema';
-import { db } from '$lib/server/db';
-import { opnsenseAuth, opnsenseUrl, serverPublicKey, serverUuid } from '$lib/server/opnsense';
-import { Address4, Address6 } from 'ip-address';
-import { env } from '$env/dynamic/private';
-import { and, count, eq, isNull } from 'drizzle-orm';
+import { devices, ipAllocations, type User } from '$lib/server/db/schema';
 import { err, ok, type Result } from '$lib/types';
-import type { DeviceDetails } from '$lib/devices';
+import { db } from '$lib/server/db';
+import { count, eq, isNull } from 'drizzle-orm';
+import { env } from '$env/dynamic/private';
+import { opnsenseAuth, opnsenseUrl, serverUuid } from '$lib/server/opnsense';
 import { opnsenseSanitezedUsername } from '$lib/opnsense';
-
-export async function findDevices(userId: string) {
-	return db.query.devices.findMany({
-		columns: {
-			id: true,
-			name: true,
-			publicKey: true,
-			privateKey: true,
-			preSharedKey: true,
-		},
-		with: {
-			ipAllocation: true,
-		},
-		where: eq(devices.userId, userId),
-	});
-}
-
-export async function findDevice(userId: string, deviceId: number) {
-	return db.query.devices.findFirst({
-		columns: {
-			id: true,
-			name: true,
-			publicKey: true,
-			privateKey: true,
-			preSharedKey: true,
-		},
-		with: {
-			ipAllocation: true,
-		},
-		where: and(eq(devices.userId, userId), eq(devices.id, deviceId)),
-	});
-}
-
-export function mapDeviceToDetails(
-	device: Awaited<ReturnType<typeof findDevices>>[0],
-): DeviceDetails {
-	const ips = getIpsFromIndex(device.ipAllocation.id);
-	return {
-		id: device.id,
-		name: device.name,
-		publicKey: device.publicKey,
-		privateKey: device.privateKey,
-		preSharedKey: device.preSharedKey,
-		ips,
-		vpnPublicKey: serverPublicKey,
-		vpnEndpoint: env.VPN_ENDPOINT,
-		vpnDns: env.VPN_DNS,
-	};
-}
+import { getIpsFromIndex } from './utils';
 
 export async function createDevice(params: {
 	name: string;
@@ -167,18 +116,6 @@ async function getKeys() {
 		privkey: keyPair['privkey'] as string,
 		psk: psk['psk'] as string,
 	};
-}
-
-export function getIpsFromIndex(ipIndex: number) {
-	ipIndex -= 1; // 1-indexed in the db
-	const v4StartingAddr = new Address4(env.IPV4_STARTING_ADDR);
-	const v6StartingAddr = new Address6(env.IPV6_STARTING_ADDR);
-	const v4Allowed = Address4.fromBigInt(v4StartingAddr.bigInt() + BigInt(ipIndex));
-	const v6Offset = BigInt(ipIndex) << (128n - BigInt(env.IPV6_CLIENT_PREFIX_SIZE));
-	const v6Allowed = Address6.fromBigInt(v6StartingAddr.bigInt() + v6Offset);
-	const v6AllowedShort = v6Allowed.parsedAddress.join(':');
-
-	return [v4Allowed.address + '/32', v6AllowedShort + '/' + env.IPV6_CLIENT_PREFIX_SIZE];
 }
 
 async function opnsenseCreateClient(params: {
