@@ -1,0 +1,25 @@
+meta {
+  name: Delete Client
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{base}}/api/wireguard/client/delClient/:clientUuid
+  body: none
+  auth: inherit
+}
+
+params:path {
+  clientUuid: d484d381-4d6f-4444-8e9d-9cda7b5b2243
+}
+
+body:json {
+  {
+    "current": 1,
+    "rowCount": 7,
+    "sort": {},
+    "servers": ["{{serverUuid}}"],
+    "searchPhrase": "{{searchPhrase}}"
+  }
+}

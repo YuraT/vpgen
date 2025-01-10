@@ -8,6 +8,7 @@
 	import type { PageData } from './$types';
 	import { Label } from '$lib/components/ui/label';
 	import { page } from '$app/state';
+	import DeleteDevice from './delete-device.svelte';
 
 	const { data }: { data: PageData } = $props();
 
@@ -56,6 +57,9 @@
 						<Badge class="select-auto bg-background" variant="secondary">{ip}</Badge>
 					{/each}
 				</Table.Cell>
+				<Table.Cell class="py-0">
+					<DeleteDevice device={device} />
+				</Table.Cell>
 			</Table.Row>
 		{/each}
 	</Table.Body>
@@ -86,11 +90,11 @@
 					class="max-w-[20ch]"
 				/>
 			</div>
-			<Dialog.Footer>
-				<Button type="submit" disabled={submitted}>
-					{#if submitted}
-						<LucideLoaderCircle class="size-4 mr-2 animate-spin" />
-					{/if}
+			<Dialog.Footer class="gap-y-2">
+				{#if submitted}
+					<LucideLoaderCircle class="size-4 animate-spin place-self-center" />
+				{/if}
+				<Button type="submit" disabled={submitted} class="">
 					Add
 				</Button>
 			</Dialog.Footer>

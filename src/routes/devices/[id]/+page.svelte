@@ -3,6 +3,7 @@
 	import QRCode from 'qrcode-svg';
 	import { CodeSnippet } from '$lib/components/app/code-snippet';
 	import { WireguardGuide } from '$lib/components/app/wireguard-guide';
+	import DeleteDevice from '../delete-device.svelte';
 
 	const { data }: { data: PageData } = $props();
 
@@ -25,7 +26,10 @@
 	<title>{data.device.name}</title>
 </svelte:head>
 
-<h1 class="w-fit rounded-lg bg-accent p-2 text-lg">{data.device.name}</h1>
+<div class="flex justify-between">
+	<h1 class="w-fit rounded-lg bg-accent p-2 text-lg">{data.device.name}</h1>
+	<DeleteDevice device={data.device} />
+</div>
 
 <section id="device-configuration" class="flex flex-wrap items-center justify-center gap-4">
 	<CodeSnippet data={data.config} filename={deviceWgCleanedName} copy download />
