@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "vpgen-sv5",
+      "name": "vpgen",
       "dependencies": {
         "@libsql/client": "^0.14.0",
         "drizzle-kit": "^0.30.4",
