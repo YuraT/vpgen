@@ -5,6 +5,7 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import type { RequestEvent } from '@sveltejs/kit';
 import { dev } from '$app/environment';
+import { env } from '$env/dynamic/private';
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -77,6 +78,10 @@ export async function validateSession(sessionId: string) {
 	}
 
 	return { session, user };
+}
+
+export function isValidInviteToken(inviteToken: string) {
+	return inviteToken === env.INVITE_TOKEN;
 }
 
 export type SessionValidationResult = Awaited<ReturnType<typeof validateSession>>;

@@ -2,7 +2,7 @@ import { ipAllocations, users, devices } from './schema';
 import { eq } from 'drizzle-orm';
 import assert from 'node:assert';
 import { drizzle } from 'drizzle-orm/libsql';
-import * as schema from '$lib/server/db/schema';
+import * as schema from './schema';
 
 assert(process.env.DATABASE_URL, 'DATABASE_URL is not set');
 const db = drizzle(process.env.DATABASE_URL, { schema });

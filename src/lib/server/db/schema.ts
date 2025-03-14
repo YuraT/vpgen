@@ -3,6 +3,7 @@ import { relations } from 'drizzle-orm';
 
 export const users = sqliteTable('users', {
 	id: text('id').primaryKey(),
+	authSource: text('auth_source').notNull().default('authentik'),
 	username: text('username').notNull(),
 	name: text('name').notNull(),
 });
