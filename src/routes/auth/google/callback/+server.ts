@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { createSession, isValidInviteToken, setSessionTokenCookie } from '$lib/server/auth';
 import type { OAuth2Tokens } from 'arctic';
+import { assertGuard } from 'typia';
 
 export const GET: RequestHandler = async (event) => {
 	const { url, cookies } = event;
@@ -26,31 +27,33 @@ export const GET: RequestHandler = async (event) => {
 		tokens = await google.validateAuthorizationCode(code, codeVerifier);
 	} catch (e) {
 		if (e instanceof arctic.OAuth2RequestError) {
-			// Invalid authorization code, credentials, or redirect URI
-			console.debug(e);
-			console.debug(state)
+			console.debug('Arctic: OAuth: invalid authorization code, credentials, or redirect URI', e);
 			return new Response(null, {
 				status: 400,
 			});
 		}
 		if (e instanceof arctic.ArcticFetchError) {
-			// Failed to call `fetch()`
-			console.debug(e.cause);
+			console.debug('Arctic: failed to call `fetch()`', e);
 			return new Response(null, {
 				status: 400,
 			});
 		}
+
+		return new Response(null, {
+			status: 500,
+		});
 	}
 
-	const accessToken = tokens.accessToken();
 	const idToken = tokens.idToken();
-	const claims = arctic.decodeIdToken(idToken) as {
+	const claims = arctic.decodeIdToken(idToken);
+
+	console.log('claims', claims);
+
+	assertGuard<{
 		sub: string;
 		email: string;
 		name: string;
-	};
-
-	console.log('claims', claims);
+	}>(claims);
 
 	const userId = claims.sub;
 	const existingUser = await db.query.users.findFirst({ where: eq(table.users.id, userId) });

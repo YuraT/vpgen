@@ -14,14 +14,16 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
-		"db:seed": "bun run ./src/lib/server/db/seed.ts"
+		"db:seed": "bun run ./src/lib/server/db/seed.ts",
+		"prepare": "ts-patch install"
 	},
 	"devDependencies": {
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
+		"@ryoppippi/unplugin-typia": "npm:@jsr/ryoppippi__unplugin-typia",
 		"@sveltejs/adapter-auto": "^3.3.1",
 		"@sveltejs/adapter-node": "^5.2.12",
-		"@sveltejs/kit": "^2.19.0",
+		"@sveltejs/kit": "^2.19.1",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@tailwindcss/container-queries": "^0.1.1",
 		"@tailwindcss/forms": "^0.5.10",
@@ -49,8 +51,10 @@
 		"tailwind-variants": "^0.3.1",
 		"tailwindcss": "^3.4.17",
 		"tailwindcss-animate": "^1.0.7",
-		"typescript": "^5.8.2",
+		"ts-patch": "^3.3.0",
+		"typescript": "~5.8.2",
 		"typescript-eslint": "^8.26.1",
+		"typia": "^8.0.2",
 		"vite": "^6.2.2"
 	},
 	"dependencies": {
