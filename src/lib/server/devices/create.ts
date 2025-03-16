@@ -3,9 +3,8 @@ import { err, ok, type Result } from '$lib/types';
 import { db } from '$lib/server/db';
 import { count, eq, isNull } from 'drizzle-orm';
 import { env } from '$env/dynamic/private';
-import { opnsenseAuth, opnsenseUrl, serverUuid } from '$lib/server/opnsense';
-import { opnsenseSanitezedUsername } from '$lib/opnsense';
 import { getIpsFromIndex } from './utils';
+import wgProvider from '$lib/server/wg-provider';
 
 export async function createDevice(params: {
 	name: string;
@@ -19,17 +18,15 @@ export async function createDevice(params: {
 	if (deviceCount >= parseInt(env.MAX_CLIENTS_PER_USER))
 		return err([400, 'Maximum number of devices reached'] as [400, string]);
 
-	// this is going to be quite long
-	// 1. fetch params for new device from opnsense api
+	// 1. fetch params for new device from provider
 	// 2.1 get an allocation for the device
 	// 2.2. insert new device into db
 	// 2.3. update the allocation with the device id
-	// 3. create the client in opnsense
-	// 4. reconfigure opnsense to enable the new client
+	// 3. create the client in provider
 	return await db.transaction(async (tx) => {
-		const [keys, availableAllocation, lastAllocation] = await Promise.all([
-			// fetch params for new device from opnsense api
-			getKeys(),
+		const [keysResult, availableAllocation, lastAllocation] = await Promise.all([
+			// fetch params for new device from provider
+			wgProvider.generateKeys(),
 			// find first unallocated IP
 			await tx.query.ipAllocations.findFirst({
 				columns: {
@@ -46,9 +43,12 @@ export async function createDevice(params: {
 			}),
 		]);
 
+		if (keysResult?._tag === 'err') return err([500, 'Failed to get keys']);
+		const keys = keysResult.value;
+
 		// check for existing allocation or if we have any IPs left
 		if (!availableAllocation && lastAllocation && lastAllocation.id >= parseInt(env.IP_MAX_INDEX)) {
-			return err([500, 'No more IP addresses available'] as [500, string]);
+			return err([500, 'No more IP addresses available']);
 		}
 
 		// use existing allocation or create a new one
@@ -65,9 +65,9 @@ export async function createDevice(params: {
 				.values({
 					userId: params.user.id,
 					name: params.name,
-					publicKey: keys.pubkey,
-					privateKey: keys.privkey,
-					preSharedKey: keys.psk,
+					publicKey: keys.publicKey,
+					privateKey: keys.privateKey,
+					preSharedKey: keys.preSharedKey,
 				})
 				.returning({ id: devices.id });
 
@@ -77,80 +77,18 @@ export async function createDevice(params: {
 				.set({ deviceId: newDevice.id })
 				.where(eq(ipAllocations.id, ipAllocationId));
 
-			// create client in opnsense
-			const opnsenseRes = await opnsenseCreateClient({
-				username: params.user.username,
-				pubkey: keys.pubkey,
-				psk: keys.psk,
+			// create client in provider
+			const providerRes = await wgProvider.createClient({
+				user: params.user,
+				publicKey: keys.publicKey,
+				preSharedKey: keys.preSharedKey,
 				allowedIps: getIpsFromIndex(ipAllocationId).join(','),
 			});
-			const opnsenseResJson = await opnsenseRes.json();
-			if (opnsenseResJson['result'] !== 'saved') {
+			if (providerRes._tag === 'err') {
 				tx2.rollback();
-				console.error(`Error creating client in OPNsense: \n${opnsenseResJson}`);
-				return err([500, 'Error creating client in OPNsense'] as [500, string]);
+				return err([500, 'Failed to create client in provider']);
 			}
-
-			// reconfigure opnsense
-			await opnsenseReconfigure();
 			return ok(newDevice.id);
 		});
-	});
-}
-
-async function getKeys() {
-	// fetch key pair from opnsense
-	const options: RequestInit = {
-		method: 'GET',
-		headers: {
-			Authorization: opnsenseAuth,
-			Accept: 'application/json',
-		},
-	};
-	const resKeyPair = await fetch(`${opnsenseUrl}/api/wireguard/server/key_pair`, options);
-	const resPsk = await fetch(`${opnsenseUrl}/api/wireguard/client/psk`, options);
-	const keyPair = await resKeyPair.json();
-	const psk = await resPsk.json();
-	return {
-		pubkey: keyPair['pubkey'] as string,
-		privkey: keyPair['privkey'] as string,
-		psk: psk['psk'] as string,
-	};
-}
-
-async function opnsenseCreateClient(params: {
-	username: string;
-	pubkey: string;
-	psk: string;
-	allowedIps: string;
-}) {
-	return fetch(`${opnsenseUrl}/api/wireguard/client/addClientBuilder`, {
-		method: 'POST',
-		headers: {
-			Authorization: opnsenseAuth,
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			configbuilder: {
-				enabled: '1',
-				name: `vpgen-${opnsenseSanitezedUsername(params.username)}`,
-				pubkey: params.pubkey,
-				psk: params.psk,
-				tunneladdress: params.allowedIps,
-				server: serverUuid,
-				endpoint: env.VPN_ENDPOINT,
-			},
-		}),
-	});
-}
-
-async function opnsenseReconfigure() {
-	return fetch(`${opnsenseUrl}/api/wireguard/service/reconfigure`, {
-		method: 'POST',
-		headers: {
-			Authorization: opnsenseAuth,
-			Accept: 'application/json',
-		},
 	});
 }

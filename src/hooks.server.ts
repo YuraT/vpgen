@@ -2,10 +2,9 @@ import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { dev } from '$app/environment';
 import * as auth from '$lib/server/auth';
-import { fetchOpnsenseServer } from '$lib/server/opnsense';
+import wgProvider from '$lib/server/wg-provider';
 
-// fetch opnsense server info on startup
-await fetchOpnsenseServer();
+await wgProvider.init();
 
 const handleAuth: Handle = async ({ event, resolve }) => {
 	const sessionId = event.cookies.get(auth.sessionCookieName);

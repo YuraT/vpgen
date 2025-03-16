@@ -1,6 +1,7 @@
 import type { Actions } from './$types';
 import { createDevice } from '$lib/server/devices';
 import { error, fail, redirect } from '@sveltejs/kit';
+import wgProvider from '$lib/server/wg-provider';
 
 export const actions = {
 	create: async (event) => {

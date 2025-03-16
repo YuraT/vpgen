@@ -2,9 +2,9 @@ import { db } from '$lib/server/db';
 import { and, eq } from 'drizzle-orm';
 import { devices } from '$lib/server/db/schema';
 import type { DeviceDetails } from '$lib/devices';
-import { serverPublicKey } from '$lib/server/opnsense';
 import { env } from '$env/dynamic/private';
 import { getIpsFromIndex } from '$lib/server/devices/index';
+import wgProvider from '$lib/server/wg-provider';
 
 export async function findDevices(userId: string) {
 	return db.query.devices.findMany({
@@ -49,7 +49,7 @@ export function mapDeviceToDetails(
 		privateKey: device.privateKey,
 		preSharedKey: device.preSharedKey,
 		ips,
-		vpnPublicKey: serverPublicKey,
+		vpnPublicKey: wgProvider.getServerPublicKey(),
 		vpnEndpoint: env.VPN_ENDPOINT,
 		vpnDns: env.VPN_DNS,
 	};
