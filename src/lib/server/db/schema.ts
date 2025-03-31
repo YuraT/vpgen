@@ -36,8 +36,6 @@ export const devices = sqliteTable('devices', {
 		.notNull()
 		.references(() => users.id),
 	name: text('name').notNull(),
-	// questioning whether this should be nullable
-	opnsenseId: text('opnsense_id'),
 	publicKey: text('public_key').notNull().unique(),
 	// nullable for the possibility of a user supplying their own private key
 	privateKey: text('private_key'),
