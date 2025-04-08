@@ -18,7 +18,7 @@ and [wg-quick](https://www.wireguard.com/quickstart/) for standalone setups.
 ## Development
 
 Development uses bun.
-An additional prepare step is needed to set up typia for type validation. 
+An additional prepare step is needed to set up typia for type validation.
 
 For example .env settings, see [.env.example](.env.example)
 

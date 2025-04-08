@@ -3,7 +3,7 @@ import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import type { RequestEvent } from '@sveltejs/kit';
+import type { Cookies } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 
@@ -22,14 +22,14 @@ export async function createSession(userId: string): Promise<table.Session> {
 	const session: table.Session = {
 		id: sessionId,
 		userId,
-		expiresAt: new Date(Date.now() + DAY_IN_MS * 30)
+		expiresAt: new Date(Date.now() + DAY_IN_MS * 30),
 	};
 	await db.insert(table.sessions).values(session);
 	return session;
 }
 
-export function setSessionTokenCookie(event: RequestEvent, sessionId: string, expiresAt: Date) {
-	event.cookies.set(sessionCookieName, sessionId, {
+export function setSessionTokenCookie(cookies: Cookies, sessionId: string, expiresAt: Date) {
+	cookies.set(sessionCookieName, sessionId, {
 		path: '/',
 		sameSite: 'lax',
 		httpOnly: true,
@@ -42,16 +42,21 @@ export async function invalidateSession(sessionId: string): Promise<void> {
 	await db.delete(table.sessions).where(eq(table.sessions.id, sessionId));
 }
 
-export function deleteSessionTokenCookie(event: RequestEvent) {
-	event.cookies.delete(sessionCookieName, { path: '/' });
+export function deleteSessionTokenCookie(cookies: Cookies) {
+	cookies.delete(sessionCookieName, { path: '/' });
 }
 
 export async function validateSession(sessionId: string) {
 	const [result] = await db
 		.select({
 			// Adjust user table here to tweak returned data
-			user: { id: table.users.id, authSource: table.users.authSource, username: table.users.username, name: table.users.name },
-			session: table.sessions
+			user: {
+				id: table.users.id,
+				authSource: table.users.authSource,
+				username: table.users.username,
+				name: table.users.name,
+			},
+			session: table.sessions,
 		})
 		.from(table.sessions)
 		.innerJoin(table.users, eq(table.sessions.userId, table.users.id))
@@ -81,7 +86,7 @@ export async function validateSession(sessionId: string) {
 }
 
 export function isValidInviteToken(inviteToken: string) {
-	return inviteToken === env.INVITE_TOKEN;
+	return inviteToken === env.AUTH_INVITE_TOKEN;
 }
 
 export type SessionValidationResult = Awaited<ReturnType<typeof validateSession>>;

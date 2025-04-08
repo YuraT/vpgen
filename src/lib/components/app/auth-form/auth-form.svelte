@@ -3,22 +3,24 @@
 	import { Button } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils.js';
 	import googleIcon from '$lib/assets/google.svg';
+	import { enabledAuthProviders } from '$lib/auth';
 
-	let { inviteToken, class: className, ...rest }: { inviteToken?: string; class?: string; rest?: { [p: string]: unknown } } = $props();
+	let { inviteToken, class: className, ...rest }: {
+		inviteToken?: string;
+		class?: string;
+		rest?: { [p: string]: unknown }
+	} = $props();
 
-	let isLoading = $state(false);
+	let submitted = $state(false);
 </script>
 
 <div class={cn('flex gap-6', className)} {...rest}>
-	<form method="get" action="/auth/authentik{inviteToken ? `?invite=${inviteToken}` : ''}">
+	{#if enabledAuthProviders.authentik }
+	<form method="get" onsubmit={() => submitted = true}
+				action="/auth/authentik{inviteToken ? `?invite=${inviteToken}` : ''}">
 		<input type="hidden" value={inviteToken} name="invite" />
-		<Button
-			type="submit"
-			onclick={() => {
-				isLoading = true;
-			}}
-		>
-			{#if isLoading}
+		<Button type="submit" disabled={submitted}>
+			{#if submitted}
 				<LucideLoaderCircle class="mr-2 h-4 w-4 animate-spin" />
 			{:else}
 				<img
@@ -30,15 +32,13 @@
 			Sign in with Authentik
 		</Button>
 	</form>
-	<form method="get" action="/auth/google">
+	{/if}
+	{#if enabledAuthProviders.google }
+	<form method="get" onsubmit={() => submitted = true}
+				action="/auth/google{inviteToken ? `?invite=${inviteToken}` : ''}">
 		<input type="hidden" value={inviteToken} name="invite" />
-		<Button
-			type="submit"
-			onclick={() => {
-				isLoading = true;
-			}}
-		>
-			{#if isLoading}
+		<Button type="submit" disabled={submitted}>
+			{#if submitted}
 				<LucideLoaderCircle class="mr-2 h-4 w-4 animate-spin" />
 			{:else}
 				<img
@@ -50,4 +50,5 @@
 			Sign in with Google
 		</Button>
 	</form>
+	{/if}
 </div>
