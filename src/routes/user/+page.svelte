@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { invalidate, invalidateAll } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
-	import { LucideLoaderCircle, LucideLogOut, LucideRefreshCw } from 'lucide-svelte';
+	import { LucideLoaderCircle, LucideLogOut, LucideRefreshCw } from '@lucide/svelte';
 	import { CodeSnippet } from '$lib/components/app/code-snippet/index.js';
 
 	let { data } = $props();

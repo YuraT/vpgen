@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LucideLoaderCircle } from 'lucide-svelte';
+	import { LucideLoaderCircle } from '@lucide/svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils.js';
 	import googleIcon from '$lib/assets/google.svg';

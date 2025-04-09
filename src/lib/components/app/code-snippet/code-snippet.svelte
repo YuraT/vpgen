@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { LucideClipboardCopy, LucideDownload } from 'lucide-svelte';
+	import { LucideClipboardCopy, LucideDownload } from '@lucide/svelte';
 
 	const {
 		data,

@@ -5,7 +5,6 @@
 	let {
 		ref = $bindable(null),
 		class: className,
-		children,
 		...restProps
 	}: DialogPrimitive.OverlayProps = $props();
 </script>
@@ -17,6 +16,4 @@
 		className
 	)}
 	{...restProps}
->
-	{@render children?.()}
-</DialogPrimitive.Overlay>
+/>

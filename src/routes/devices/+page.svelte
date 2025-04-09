@@ -4,7 +4,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { LucideLoaderCircle, LucidePlus } from 'lucide-svelte';
+	import { LucideLoaderCircle, LucidePlus } from '@lucide/svelte';
 	import type { PageData } from './$types';
 	import { Label } from '$lib/components/ui/label';
 	import { page } from '$app/state';
