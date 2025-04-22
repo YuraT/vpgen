@@ -2,7 +2,7 @@
 # see all versions at https://hub.docker.com/r/oven/bun/tags
 FROM oven/bun:1-alpine AS base
 WORKDIR /app
-COPY package.json bun.lockb /app/
+COPY package.json bun.lock /app/
 
 # install dependencies into temp directory
 # this will cache them and speed up future builds
@@ -14,7 +14,7 @@ RUN cd /temp/dev && bun install --frozen-lockfile
 # install with --production (exclude devDependencies)
 RUN mkdir -p /temp/prod
 COPY package.json bun.lock /temp/prod/
-RUN cd /temp/prod && bun install --frozen-lockfile --production
+RUN cd /temp/prod && bun install --frozen-lockfile --production --ignore-scripts
 
 # copy node_modules from temp directory
 # then copy all (non-ignored) project files into the image
