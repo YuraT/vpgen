@@ -10,7 +10,7 @@
 </svelte:head>
 
 <h1 class="mb-2 scroll-m-20 text-center text-3xl font-extrabold tracking-tight lg:text-4xl">
-	Welcome to VPGen
+	You are invited to VPGen
 </h1>
 
-<AuthForm inviteToken={inviteToken} />
+<AuthForm {inviteToken} />
